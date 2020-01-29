@@ -19,6 +19,8 @@ function [R,P] = plotCorrelationMatrix(X,labels)
 % MIT License
 % Copyright (c) 2020 Anouk de Brouwer
 
+cla reset % clear and reset figure axes
+
 nVar = size(X,2);
 
 % if labels are not provided, use numbers
@@ -27,7 +29,7 @@ if nargin==1
 end
 
 % compute correlations
-[R,P] = corrcoef(X);
+[R,P] = corrcoef(X,'rows','pairwise');
 
 % hide above-diagonal values by making r values above the diagonal 0 and
 % p values above the diagonal 1
