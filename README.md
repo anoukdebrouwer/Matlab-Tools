@@ -31,6 +31,7 @@ labels = {'MPG','Displacement','Acceleration','Horsepower','Weight','Random numb
 figure
 plotCorrelationMatrix(X,labels);
 ```
+![Correlation matrix](https://github.com/anoukdebrouwer/Matlab-tools/tree/master/Images/correlationMatrix_example.pdf)
 
 ## plotMeansWithDataPoints.m
 Create a boxplot-like plot displaying the mean or median value as a line, the variance as a shaded area, and individual values as points. By default, the mean and standard error of the mean are plotted, but alternative measures for central tendency and variance can be specified by the user. Colors can be specified to group variables. 
@@ -50,6 +51,7 @@ plotMeansWithDataPoints([sepal_length sepal_width],[],[],colors,{'setosa','versi
 set(gca,'XTick',[2,5])
 set(gca,'XTickLabel',{'Length','Width'})
 ```
+![Means with data points](https://github.com/anoukdebrouwer/Matlab-tools/tree/master/Images/meansWithDataPoints_example.pdf)
 
 ## saveFigAsPDF.m
 Save the current figure as a pdf file. The file name, path, and font size are specified by the user. 
@@ -77,6 +79,7 @@ scatterWithLinearFit(Horsepower,Acceleration)
 xlabel('Horsepower')
 ylabel('Acceleration')
 ```
+![Scatter with linear fit](https://github.com/anoukdebrouwer/Matlab-tools/tree/master/Images/scatterWithLinearFit_example.pdf)
 
 ## selectFiles.m
 Manually select files or folders matching a name (can include wildcards) from a list printed in the command window. Return a struct with file info.
@@ -85,3 +88,4 @@ Example:
 ```
 folders = selectFiles('1_RawData/S*day1*','folders')
 ```
+![Select files](https://github.com/anoukdebrouwer/Matlab-tools/tree/master/Images/selectFiles_example.png)
