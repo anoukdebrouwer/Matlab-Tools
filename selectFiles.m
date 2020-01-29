@@ -32,7 +32,7 @@ fileNames(:,2) = {files.name}' % show file numbers and names
 
 % ask for user input
 if ~isempty(fileNames)
-    fileNumbers = input('Select data files or folders by typing the numbers (e.g., [1,5]) or press enter to select all: ');
+    fileNumbers = input('Select data files or folders by typing the numbers \n(e.g., [1:5,7]) or press enter to select all: ');
     if fileNumbers>0
         selectedFiles = files(fileNumbers);
     else
