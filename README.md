@@ -89,4 +89,4 @@ Example:
 <img src="/Images/selectFiles_example.png" width="600">
 
 ## xy2CompassAngle.m
-Converts xy position to angle in degrees where 0 degrees is north and clockwise rotations are positive. 
+Convert xy position to angle in degrees where 0 degrees is north and clockwise rotations are positive. 
