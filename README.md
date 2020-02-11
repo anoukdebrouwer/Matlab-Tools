@@ -87,3 +87,6 @@ Manually select files or folders matching a name (can include wildcards) from a 
 Example:
 
 <img src="/Images/selectFiles_example.png" width="600">
+
+## xy2CompassAngle.m
+Converts xy position to angle in degrees where 0 degrees is north and clockwise rotations are positive. 
