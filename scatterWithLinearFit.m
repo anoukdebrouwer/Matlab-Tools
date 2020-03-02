@@ -22,7 +22,7 @@ function [b,r,p,n] = scatterWithLinearFit(x,y,xyLim,color,noPlot)
 % Anouk de Brouwer
 
 cla reset % clear and reset figure axes
-delete(findall(gcf,'type','annotation')) % delete any previous annotations
+delete(findall(gca,'type','annotation')) % delete any previous annotations
 
 % make sure variables are in columns and remove NaNs
 x = x(:);
