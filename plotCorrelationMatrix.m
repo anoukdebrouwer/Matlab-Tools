@@ -33,7 +33,8 @@ end
 
 % hide above-diagonal values by making r values above the diagonal 0 and
 % p values above the diagonal 1
-[rowIndex,colIndex] = find(~isnan(R));
+rowIndex = repmat(1:nVar,1,nVar);
+colIndex = repelem(1:nVar,nVar);
 R(colIndex>rowIndex) = 0;
 P(colIndex>rowIndex) = 1;
 
@@ -61,26 +62,46 @@ set(gca,'TickLength',[0 0])
 axis square; box off
 title('Correlations')
 
-% add text displaying r-values with asterisks for significance
-for row = 1 : nVar
-    for col = 1 : nVar
-        if row>col % below diagonal
-            str = num2str(R(row,col),2);
-            if P(row,col)<0.001
-                str = [str '***'];
-            elseif P(row,col)<0.01
-                str = [str '**'];
-            elseif P(row,col)<0.05
-                str = [str '*'];
+% get estimate of text size displaying r-values and asterisks for
+% significance and determine the maximum number of variables for which
+% text will fit
+t = text(1,1,' 0.00*** ');
+t.Units = 'normalized';
+textSize = t.Extent;
+delete(t);
+maxVar(1) = floor(1/textSize(3));
+t = text(1,1,' *** ');
+t.Units = 'normalized';
+textSize = t.Extent;
+maxVar(2) = floor(1/textSize(3));
+delete(t);
+% add text if it fits
+if nVar<=maxVar(2)
+    for row = 1 : nVar
+        for col = 1 : nVar
+            if row>col % below diagonal
+                if nVar<=maxVar(1)
+                    str = num2str(R(row,col),'%.2f');
+                else
+                    str = '';
+                end;
+                if P(row,col)<0.001
+                    str = [str '***'];
+                elseif P(row,col)<0.01
+                    str = [str '**'];
+                elseif P(row,col)<0.05
+                    str = [str '*'];
+                end
+                text(col,row,str,'HorizontalAlignment','center');
             end
-            text(col,row,str,'HorizontalAlignment','center');
         end
     end
 end
-
 % add legend for significance
-text(nVar*0.8,1,{'*   p<0.05','**  p<0.01','*** p<0.001'},...
-    'HorizontalAlignment','Left')
+if nVar<=maxVar(1)
+    text(nVar*0.8,1,{'*   p<0.05','**  p<0.01','*** p<0.001'},...
+        'HorizontalAlignment','Left')
+end
 
 end
 
