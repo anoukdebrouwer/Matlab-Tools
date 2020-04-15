@@ -1,4 +1,4 @@
-# Other Matlab tools
+# Analysis tools
 
 ## findIntervals.m
 Extension of Matlab's ```find``` function. Find the start and end row indices of all intervals during which one or multiple conditions (i.e., columns in the data  matrix) are nonzero. The minimum length of the interval (i.e., rows in the data matrix) during which the conditions need to be nonzero is specified by the user.
