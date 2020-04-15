@@ -1,7 +1,7 @@
 # Matlab-tools
 
 ## Plotting
-This folder contains the following functions. See folder README for details and example figures.
+The 'Plotting' folder contains functions for making pretty plots in Matlab. See folder README for details and example figures.
 * createColorGradient.m
 * horline.m
 * plotCorrelationMatrix.m
@@ -12,7 +12,7 @@ This folder contains the following functions. See folder README for details and 
 * vertline.m
 
 ## Other
-This folder contains the following functions. See folder README for details.
+The 'Other' folder contains useful functions for analysis in Matlab. See folder README for details.
 * findIntervals.m
 * selectFiles.m
 * xy2compassAngle.m
