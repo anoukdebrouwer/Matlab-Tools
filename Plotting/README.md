@@ -1,4 +1,4 @@
-# Matlab-tools/Plotting
+# Plotting tools
 
 ## createColorGradient.m
 Create an RGB color gradient between two colors, with the start and end color and the number of colors in the gradient specified by the user.
