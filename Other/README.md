@@ -6,8 +6,8 @@ Extension of Matlab's ```find``` function. Find the start and end row indices of
 Example: 
 ```
 %% find when both the x and y position of the measured hand position are in the target area for at least 10 measurement samples
-xInTarget = x > (xtarget-0.5*targetWidth) & x < (xtarget+0.5*targetWidth);
-yInTarget = y > (ytarget-0.5*targetHeight) & y < (ytarget+0.5*targetHeight);
+xInTarget = xHand > (xtarget-0.5*targetWidth) & xHand < (xtarget+0.5*targetWidth);
+yInTarget = yHand > (ytarget-0.5*targetHeight) & yHand < (ytarget+0.5*targetHeight);
 [i,iStartEnd] = findIntervals([xInTarget yInTarget],10);
 ```
 
