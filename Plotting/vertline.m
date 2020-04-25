@@ -1,14 +1,14 @@
 function vertline(x,varargin)
-% vertline
-% plot vertical line in current figure
+% VERTLINE
+% Plot vertical line in current figure
 %
-% vertline(x) plots vertical lines in the current figure at the location 
+% VERTLINE(x) plots vertical lines in the current figure at the location
 % specified by x.
-
-% vertline(x,'linespec') sets the line color and style. Default is 'k:'.
-
-% vertline(x,Name,Value) specifies line properties using one or more Name, 
-% Value pair arguments. 
+%
+% VERTLINE(x,'linespec') sets the line color and style. Default is 'k:'.
+%
+% VERTLINE(x,Name,Value) specifies line properties using one or more Name,
+% Value pair arguments.
 % 'color' sets the line color, specified by an RGB triplet or color string.
 % 'linestyle' sets the line style. '-' | '--' | ':' | '-.'
 % 'linewidth' sets the line width. Default 0.5.
@@ -30,10 +30,10 @@ addParameter(p,'linewidth',0.5,@isnumeric)
 parse(p,x,varargin{:})
 
 % get values
-col = []; 
+col = [];
 lin = [];
 % if linespec is defined, use value
-if ~ismember('linespec',p.UsingDefaults) 
+if ~ismember('linespec',p.UsingDefaults)
     col = p.Results.linespec(isletter(p.Results.linespec));
     lin = p.Results.linespec(~isletter(p.Results.linespec));
 end
