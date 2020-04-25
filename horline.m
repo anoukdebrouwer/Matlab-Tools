@@ -1,14 +1,14 @@
 function horline(y,varargin)
-% horline
-% plot horizontal line in current figure
+% HORLINE
+% Plot horizontal line in current figure
 %
-% horline(y) plots horizontal lines in the current figure at the location 
+% HORLINE(y) plots horizontal lines in the current figure at the location
 % specified by y.
-
-% horline(y,'linespec') sets the line color and style. Default is 'k:'.
-
-% horline(y,Name,Value) specifies line properties using one or more Name, 
-% Value pair arguments. 
+%
+% HORLINE(y,'linespec') sets the line color and style. Default is 'k:'.
+%
+% HORLINE(y,Name,Value) specifies line properties using one or more Name,
+% Value pair arguments.
 % 'color' sets the line color, specified by an RGB triplet or color string.
 % 'linestyle' sets the line style. '-' | '--' | ':' | '-.'
 % 'linewidth' sets the line width. Default 0.5.
@@ -30,10 +30,10 @@ addParameter(p,'linewidth',0.5,@isnumeric)
 parse(p,y,varargin{:})
 
 % get values
-col = []; 
+col = [];
 lin = [];
 % if linespec is defined, use value
-if ~ismember('linespec',p.UsingDefaults) 
+if ~ismember('linespec',p.UsingDefaults)
     col = p.Results.linespec(isletter(p.Results.linespec));
     lin = p.Results.linespec(~isletter(p.Results.linespec));
 end
