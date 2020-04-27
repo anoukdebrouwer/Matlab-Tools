@@ -50,6 +50,7 @@ fadedColors = color+(1-color)*0.75;
 if nargin<5
     labels = {};
 end
+iLabels = [1; find(any(diff(color),2))+1];
 
 % plot
 nRow = size(Y,1);
@@ -75,12 +76,12 @@ for i = 1 : nCol
     p(i) = plot(x(i,:),[mY(i) mY(i)],'color',color(i,:),'linewidth',2);
     
     % set x axis labels or legend
-    if i==length(labels)
+    if i==nCol
         set(gca,'XTick',1:nCol)
         if length(labels)==nCol
             set(gca,'XTicklabels',labels)
         else
-            legend(p,labels,'location','best');
+            legend(p(iLabels),labels,'location','best');
         end
     end
 end
