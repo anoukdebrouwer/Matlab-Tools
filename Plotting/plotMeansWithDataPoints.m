@@ -10,13 +10,14 @@ function p = plotMeansWithDataPoints(Y,mY,varY,color,labels)
 % column; if Y is a vector, there is just one 'box'.
 %
 % plotMeansWithDataPoints(Y,mY) allows the use of an alternative central
-% dispersion measure (e.g., the median) provided in mY.
+% dispersion measure (e.g., the median) provided in mY (default is mean).
 %
 % plotMeansWithDataPoints(Y,mY,varY) allows the use of an alternative
-% variance measure (e.g., the interquartile range) provided in mY.
+% variance measure (e.g., the interquartile range) provided in varY
+% (default is standard error).
 %
 % plotMeansWithDataPoints(Y,mY,varY,color) allows to specify one or
-% multiple RGB colors. Colors can be used to group variables.
+% multiple RGB colors (default is grey). Colors can be used to group variables.
 %
 % plotMeansWithDataPoints(Y,mY,varY,color,labels) allows set x axis labels,
 % or, when multiple colors are provided, to specify the labels for a legend,
