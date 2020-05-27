@@ -1,7 +1,7 @@
 function processVMRtabletData(plotTrials)
-% processVMRtabletData(plotTrials)
+% processVMRtabletData  Process raw data from VMR experiments on tablet setup
 %
-% General function to load, process, and visually inspect hand and eye
+% processVMRtabletData loads, processes, and visualizes hand and eye
 % movement data collected in a visuomotor rotation (VMR) experiment on a 
 % tablet setup at Queen's University:
 % - Wacom tablet with pen and Eyelink 1000 desktop tracker in Abramsky Hall
@@ -488,16 +488,14 @@ for s = 1 : nSubj
             iRing = iComplete;
         end
         
-        % check movement time in trials qualified as 'Short'
+        % keep trials that were categorized as 'Short' online
+        % but cursor reached the ring, if movement time was good
         if ~isempty(iRing) && strcmpi(feedbackMessage{t},'Short')
             MT = time_tr(iRing) - time_tr(iLeave);
             if MT>maxMT(t)
                 feedbackGood = false;
             else
-                keep = input(['MT = ' num2str(MT) ' ms. Keep trial? yes(1) or no(0): ']);
-                if keep==1
-                    feedbackMessage{t} = 'Good';
-                end
+                feedbackMessage{t} = 'Good';
             end
         end
         
@@ -758,7 +756,7 @@ for s = 1 : nSubj
     
     nReport = sum(~isnan(explicit1Angle));
     nReportTrials = sum(ismember(trialType,'ReachDM_G') | ismember(trialType,'ReachDM_K') | ismember(trialType,'ReachDM_L'));
-    fprintf('\n%d / %d trials with report',nReport,nReportTrials);
+    fprintf('\n%d / %d trials with report\n',nReport,nReportTrials);
     
     %% Create structs for saving
     
