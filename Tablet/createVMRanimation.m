@@ -1,6 +1,5 @@
 function createVMRanimation(dataPath,trials,plotGaze)
-% createVMRanimation
-% create avi animation of VMR task
+% createVMRanimation  Create avi animation of VMR task
 
 % MIT License
 % Copyright (c) 2020 Anouk de Brouwer

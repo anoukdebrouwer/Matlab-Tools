@@ -1,6 +1,5 @@
 function [Exp] = getTabletExpInfo(Exp,textdata)
-% getTabletExpInfo
-% Get tablet experiment information 
+% getTabletExpInfo  Get tablet experiment information 
 % 
 % [Exp] = getTabletExpInfo(Exp,textdata) gets general information about 
 % subject, task program, stimuli, timing and setup from the header of the 

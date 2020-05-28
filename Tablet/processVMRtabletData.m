@@ -17,7 +17,7 @@ function processVMRtabletData(plotTrials)
 % information about the experiment and trials, and a struct 'D' with data. 
 % The processed data will be saved in a subfolder named '2_ProcessedData'. 
 %
-% processTabletData(TRUE) plots each trial separately for visual inspection
+% processVMRtabletData(TRUE) plots each trial separately for visual inspection
 % during processing, and waits for the user to click a button to continue
 % to the next trial. The plot contains a subplot of the xy position of the
 % stimuli, hand and gaze, and a subplot of the hand and gaze position over 
