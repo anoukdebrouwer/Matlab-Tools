@@ -1,7 +1,6 @@
 function S = replaceErrorTrialsInStruct(S,out,replaceZerosWithNans)
-% replaceErrorTrialsInStruct
-% Replace the values in a data struct with NaNs for trials categorized as
-% error trials.
+% replaceErrorTrialsInStruct  Replace the values in a data struct with NaNs 
+% for trials categorized as error trials
 %
 % S = replaceErrorTrialsInStruct(S,out,replaceZerosWithNans)
 

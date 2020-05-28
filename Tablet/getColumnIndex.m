@@ -1,5 +1,5 @@
 function [Index]=getColumnIndex(ColumnHeaders,VariableName)
-% getColumnIndex  Get index of data column by name
+% getColumnIndex  Get index of data column by variable name
 
 % Jason Gallivan
 % Modified by Anouk de Brouwer

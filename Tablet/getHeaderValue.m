@@ -1,5 +1,5 @@
 function [value,lineNr]=getHeaderValue(headerData,variableName)
-% getHeaderValue  Get value from text header of datafile
+% getHeaderValue  Get value from text header of datafile by variable name
 
 % Jason Gallivan
 % Modified by Anouk de Brouwer

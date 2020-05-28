@@ -1,7 +1,6 @@
 function [i,iStartEnd] = findIntervals(X,n)
-% findIntervals
-% Find start and end indices of intervals during which one or multiple
-% conditions are nonzero.
+% findIntervals  Find start and end indices of intervals during which one 
+% or multiple conditions are nonzero
 % 
 % i = findIntervals(X,n) returns the first index of when all columns in X 
 % are nonzero for n or more rows. X should be a vector or a matrix with the 

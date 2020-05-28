@@ -1,8 +1,7 @@
 function theta = xy2compassAngle(x,y,maxAngle)
-% xy2compassAngle
-% Convert xy position to compass angle
+% xy2compassAngle  Convert xy position to compass angle
 %
-% theta = xyToCompassAngle(x,y) converts xy position to angle in degrees 
+% theta = xy2compassAngle(x,y) converts xy position to angle in degrees 
 % where 0 degrees is north and clockwise rotations are positive. 
 % Default values are in the range of 0 to 360 degrees.
 %

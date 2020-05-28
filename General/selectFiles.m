@@ -1,6 +1,5 @@
 function selectedFiles = selectFiles(name,filesOrFolders)
-% selectFiles
-% Select files or folders from a list
+% selectFiles  Select files or folders from a list
 % 
 % selectedFiles = selectFiles('name') prints all files and folders that 
 % match the string names, waits for user input to select files, and returns 

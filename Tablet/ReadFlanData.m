@@ -1,5 +1,5 @@
 function [Data]=ReadFlanData(FileName)
-% ReadFlanData  Text import function for Flanagan lab data
+% ReadFlanData  Import Flanagan lab text data file
 
 % Jason Gallivan
 
