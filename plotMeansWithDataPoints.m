@@ -32,12 +32,12 @@ cla reset % clear and reset axes
 
 % compute means if measure of central tendency is not provided
 if ~isempty(Y) && (nargin==1 || isempty(mY))
-    mY = mean(Y);
+    mY = nanmean(Y);
 end
 
 % compute standard error if measure of variance is not provided
 if ~isempty(Y) && (nargin<3 || isempty(varY))
-    varY = std(Y)./sqrt(size(Y,1));
+    varY = nanstd(Y)./sqrt(size(Y,1));
 end
 
 % use grey if color is not provided
