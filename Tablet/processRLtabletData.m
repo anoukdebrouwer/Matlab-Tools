@@ -19,7 +19,9 @@ function processRLtabletData(plotTrials)
 %
 % processRLTabletData(TRUE) plots each trial separately for visual inspection
 % during processing, and waits for the user to click a button to continue
-% to the next trial. The plot contains XXX.
+% to the next trial. The plot is an x y plot of the target path that the 
+% participant had to copy or find, the participant's cursor path, and the 
+% score shown to the participant.
 
 % MIT License
 % Copyright (c) 2020 Anouk de Brouwer
