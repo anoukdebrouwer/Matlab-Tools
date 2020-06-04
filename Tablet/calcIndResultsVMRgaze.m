@@ -1,5 +1,5 @@
 function calcIndResultsVMRgaze(processData,createPlots,savePlots)
-% calcIndResultsVMRgaze  Calculate results of individual subjects in VMR
+% calcIndResultsVMRgaze  Calculate individual participant results in VMR
 % experiments with gaze tracking.
 
 % MIT License

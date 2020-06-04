@@ -145,11 +145,11 @@ for s = 1 : nSubj
         end
         T = ReadFlanData([subjDir dataFiles(t).name]);
         
-        %% Scan header for landmark presence, get landmark properties
+        %% Get landmark properties (if landmarks were present)
         % and shorten header for faster processing
         
         % for first trial of session:
-        % get locations of landmark circles if present
+        % scan header for landmark presence and get locations of landmark circles
         if t==1
             nHeaderLines = getHeaderValue(T.textdata,'HeaderLines');
             firstLandmarkLine = [];
@@ -198,7 +198,7 @@ for s = 1 : nSubj
         end
         textdata{1} = ['Headerlines ' num2str(length(textdata))];
         
-        %% Get general experiment info
+        %% Get general experiment information
         
         % get general info from datafile of first trial
         if t==1
@@ -248,7 +248,7 @@ for s = 1 : nSubj
         
         %% Get trial and stimulus information
         
-        % get trial information
+        % get trial info
         dateTimeStr = getHeaderValue(textdata,'Created');
         dateTime(t,:) = datevec(dateTimeStr(2:end-1),'ddd mmm dd HH:MM:SS yyyy');
         blockNo(t) = getHeaderValue(textdata,'BlockNumber');
@@ -355,7 +355,7 @@ for s = 1 : nSubj
         feedbackGood = strcmpi(feedbackMessage{t},'Good') | strcmpi(feedbackMessage{t},'Short') | ...
             strcmpi(feedbackMessage{t},'Hit') | strcmpi(feedbackMessage{t},'Miss');
         
-        %% Select raw data from target onset until reach complete or feedback
+        %% Select raw data from target onset until end of trial
         
         % get time at start and end end of recording
         tRecStartEnd(t,1) = T.data(1,1);
@@ -689,7 +689,7 @@ for s = 1 : nSubj
                 xlabel('Time since target onset (s)')
                 ylabel('Direction (deg)')
             end
-            waitforbuttonpress % click/press key to continue, press CTRL+C to stop
+            waitforbuttonpress % click/press key to continue
         end
         
     end % end of loop over trials
