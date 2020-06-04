@@ -10,15 +10,15 @@
 * **xy2compassAngle.m** - Convert xy position to angle in degrees where 0 degrees is north and clockwise rotations are positive. 
 
 ## Tablet
-Code for analyzing data collected on tablet setup
-* **analyzeVMRgazeData.m** - Analyze gaze data of visuomotor rotation experiments
+Code for analyzing data collected on tablet setup.
+* **analyzeVMRgazeData.m** - Analyze gaze data of visuomotor rotation experiments.
 * **calcIndResultsVMRgaze.m** - Calculate individual participant results of visuomotor rotation experiments with gaze tracking.
-* **createRLanimation.m** - Create avi animation of reward learning task
-* **createVMRanimation.m** - Create avi animation of visuomotor rotation task
-* **getColumnIndex.m** - Get index of data column by variable name
-* **getHeaderValue.m** - Get value from text header of datafile by variable name
-* **getTabletExpInfo.m** -  Get tablet experiment information from header of datafile
-* **plotIndResultsVMRgaze.m** - Create plots with individual participant results calculated in ```calcIndResultsVMRgaze```
-* **processRLtabletData.m** - Process raw data from reward learning experiments on tablet setup
-* **processVMRtabletData.m** -  Process raw data from visuomotor rotation experiments on tablet setup
-* **readFlanData.m** - Import Flanagan lab text data file
+* **createRLanimation.m** - Create avi animation of reward learning task.
+* **createVMRanimation.m** - Create avi animation of visuomotor rotation task.
+* **getColumnIndex.m** - Get index of data column by variable name.
+* **getHeaderValue.m** - Get value from text header of datafile by variable name.
+* **getTabletExpInfo.m** -  Get tablet experiment information from header of datafile.
+* **plotIndResultsVMRgaze.m** - Create plots with individual participant results calculated in ```calcIndResultsVMRgaze```.
+* **processRLtabletData.m** - Process raw data from reward learning experiments on tablet setup.
+* **processVMRtabletData.m** -  Process raw data from visuomotor rotation experiments on tablet setup.
+* **readFlanData.m** - Import Flanagan lab text data file.
