@@ -3,10 +3,14 @@
 ## createColorGradient.m
 Create an RGB color gradient between two colors, with the start and end color and the number of colors in the gradient specified by the user.
 
-Example:
-```
-createColorGradient([0 1 0],[0 0 1],20)
-```
+## errorb.m
+Draw error bars. By Jonathan C. Lansey, retrieved from [Matlab File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/27387-create-healthy-looking-error-bars).
+
+## getxPositionOfBars.m
+Get the x position of bars in a bar plot, e.g. for drawing error bars.
+
+## horline.m
+Draw a horizontal line in the current figure.
 
 ## plotCorrelationMatrix.m
 Visualize the correlation between each two variables in the data as a colored cell in a correlation matrix, using a red-white-blue color gradient. Display the correlation coefficient in each cell with asterisks indicating the significance.
@@ -45,18 +49,8 @@ set(gca,'XTickLabel',{'Length','Width'})
 ## saveFigAsPDF.m
 Save the current figure as a pdf file. The file name, path, and font size are specified by the user. 
 
-Example:
-```
-saveFigAsPDF('meansWithDataPoints_example',10)
-```
-
 ## scaledFigure.m
 Create a new figure window whose width and height are independently scaled by a factor relative to the default figure size.
-
-Example:
-```
-scaledFigure(2,1)
-```
 
 ## scatterWithLinearFit.m
 Create a scatter plot with a least-squares fitted line and a text box displaying the number of valid data points, correlation coefficient and corresponding p-value
@@ -69,3 +63,9 @@ xlabel('Horsepower')
 ylabel('Acceleration')
 ```
 <img src="/Images/scatterWithLinearFit_example.png" width="500">
+
+## suplabel.m
+Place a title, xlabel, or ylabel on a group of subplots. By Ben Barrowes, retrieved from [Matlab File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/7772-suplabel).
+
+## vertline.m
+Draw a vertical line in the current figure.
