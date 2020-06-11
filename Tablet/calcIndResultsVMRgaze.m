@@ -51,11 +51,8 @@ nTrialBins = nTrials/8;
 blocks = cellstr([repmat('block',nBlocks,1) num2str((1:nBlocks)')]);
 days = {'day1','day2'};
 if exist('breakTrials','var')
-    if iscell(breakTrials)
-        breakTrials = breakTrials{expNumber};
-        if size(breakTrials,2)<nDays
-            breakTrials = [breakTrials(:) breakTrials(:)];
-        end
+    if size(breakTrials,2)<nDays
+        breakTrials = [breakTrials(:) breakTrials(:)];
     end
 else
     breakTrials = [];
@@ -194,7 +191,7 @@ for s = 1 : nSubj
             if ~all(noGazeData)
                 [~,ind] = max(abs(ExpDetails(1).cursorRotation));
                 vmr = ExpDetails(1).cursorRotation(ind);
-                [percTimeFix_temp,fixAngles_temp,D_new] = analyzeVMRgazeData(Exp,D_new,minMaxPercDistance,nsNew,true);
+                [percTimeFix_temp,fixAngles_temp,D_new] = analyzeVMRgazeData(Exp,D_new,minMaxPercDistance,true);
                 analyzedGazeData(1:n,d) = D_new.analyzedGazeData;
                 
                 % fixation angle closest to target and aimpoint
@@ -277,12 +274,19 @@ for s = 1 : nSubj
                 %% Compute probability of fixating the target or aimpoint zone over time
                 % for experiments with target preview only
                 
-                if ~isempty(nsNew) && ~isfield(D_new,'dirGaze_meanFix_resampled')
+                if ~isempty(nsNew)
                     
-                    % concatenate resampled intervals
-                    dirGaze_resampled = cat(1,D_new.dirGaze_meanFix_resampled{:});
-                    distGaze_resampled = cat(1,D_new.distGaze_meanFix_resampled{:});
-                    nsTotal = length(dirGaze_resampled);
+                    % resample
+                    len_resampled = sum(nsNew);
+                    dirGaze_resampled = NaN(len_resampled,nTrials);
+                    distGaze_resampled = NaN(len_resampled,nTrials);
+                    for t = 1 : nTrials
+                        if D_new.analyzedGazeData(t)
+                            nsOld = D_new.iTargetGoLeaveRingEnd(t,:);
+                            dirGaze_resampled(:,t) = resampleGazeIntervals(D_new.dirGaze_meanFix{t},nsOld,nsNew);
+                            distGaze_resampled(:,t) = resampleGazeIntervals(D_new.distGaze_meanFix{t},nsOld,nsNew);
+                        end
+                    end
                     
                     % compute probabilities for each block
                     probFix_blocks.intervalNames = {'Preview','RT','Reach','Feedback'};
@@ -295,10 +299,10 @@ for s = 1 : nSubj
                         nAnalyzed_curr = sum(D_new.analyzedGazeData(currBlock));
                         dirGaze_curr = dirGaze_resampled(:,currBlock);
                         distGaze_curr = distGaze_resampled(:,currBlock);
-                        probFix_blocks.(days{d}).(blocks{b}).start(1:nsTotal) = ...
+                        probFix_blocks.(days{d}).(blocks{b}).start(1:len_resampled) = ...
                             sum(distGaze_curr<minMaxPercDistance(1),2)/nAnalyzed_curr;
                         for iPearl = 1 : nPearlBins
-                            probFix_blocks.(days{d}).(blocks{b}).pearls(1:nsTotal,iPearl) = ...
+                            probFix_blocks.(days{d}).(blocks{b}).pearls(1:len_resampled,iPearl) = ...
                                 sum(dirGaze_curr>pearlBinAngles(iPearl,1) & dirGaze_curr<pearlBinAngles(iPearl,2),2)/nAnalyzed_curr;
                         end
                     end
@@ -314,10 +318,10 @@ for s = 1 : nSubj
                         nAnalyzed_curr = sum(D_new.analyzedGazeData(currBlock));
                         dirGaze_curr = dirGaze_resampled(:,currBlock);
                         distGaze_curr = distGaze_resampled(:,currBlock);
-                        probFix_subblocks.(days{d}).(subBlocks_rot{bsub}).start(1:nsTotal) = ...
+                        probFix_subblocks.(days{d}).(subBlocks_rot{bsub}).start(1:len_resampled) = ...
                             sum(distGaze_curr<minMaxPercDistance(1),2)/nAnalyzed_curr;
                         for iPearl = 1 : nPearlBins
-                            probFix_subblocks.(days{d}).(subBlocks_rot{bsub}).pearls(1:nsTotal,iPearl) = ...
+                            probFix_subblocks.(days{d}).(subBlocks_rot{bsub}).pearls(1:len_resampled,iPearl) = ...
                                 sum(dirGaze_curr>pearlBinAngles(iPearl,1) & dirGaze_curr<pearlBinAngles(iPearl,2),2)/nAnalyzed_curr;
                         end
                     end
@@ -336,7 +340,7 @@ for s = 1 : nSubj
             % hit angle, explicit angles and fixation angle
             cursorRotation(1:n,d) = Exp.cursorRotation;
             hitAngle_cursor(1:n,d) = D_new.hitAngle_cursor(:,1);
-            hitAngle_hand(1:n,d) = D_new.hitAngle_hand(:,1);            
+            hitAngle_hand(1:n,d) = D_new.hitAngle_hand(:,1);
             explicitAngle(1:n,d) = D_new.explicit1Angle;
             explicitAngle_outliersRemoved(:,d) = explicitAngle(:,d);
             explicitAngle_outliersRemoved(explicitAngle(:,d)<-90 | explicitAngle(:,d)>45,d) = NaN; % remove outliers

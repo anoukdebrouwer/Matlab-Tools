@@ -1,4 +1,4 @@
-function [percTimeFix,fixAngle,D] = analyzeVMRgazeData(Exp,D,minMaxPercDistance,resampleIntervals,plotTrials)
+function [percTimeFix,fixAngle,D] = analyzeVMRgazeData(Exp,D,minMaxPercDistance,plotTrials)
 % analyzeVMRgazeData  Analyze gaze data from VMR experiments
 %
 % [percTimeFix,fixAngle,D] = analyzeVMRgazeData(Exp,D,minMaxPercDistance)
@@ -10,11 +10,6 @@ function [percTimeFix,fixAngle,D] = analyzeVMRgazeData(Exp,D,minMaxPercDistance,
 % distGaze_meanFix (all fixations), dirGaze_meanFix (only fixations between
 % [min% max%] distance).
 %
-% If resampleIntervals is provided, the data is additionally resampled
-% (normalized) to the interval durations provided as a single vector or a
-% matrix with a row for each trial [preview RT reach post-reach]. This can
-% be used for averaging trials.
-%
 % If plotTrials is set to TRUE, each trial with the detected fixations is
 % plotted for visual inspection.
 %
@@ -22,21 +17,17 @@ function [percTimeFix,fixAngle,D] = analyzeVMRgazeData(Exp,D,minMaxPercDistance,
 % 1) Correct gaze data (optional) and determine number of useful samples
 % 2) Detect saccades and fixations
 % 3) Compute and save mean fixation distances and angles
-% 4) Resample gaze data to normalized preview, RT, reach and post-reach duration
-% 5) Compute percentage of time that fixation occurs in each pearl bin
+% 4) Compute percentage of time that fixation occurs in each pearl bin
 %    during target preview and reach execution
-% 6) Create matrix with fixation angles relative to target(s) during target
+% 5) Create matrix with fixation angles relative to target(s) during target
 %    preview and reach execution
-% 7) Plot all fixations (optional, plotTrials==true)
+% 6) Plot all fixations (optional, plotTrials==true)
 
 % MIT License
 % Copyright (c) 2020 Anouk de Brouwer
 
 
 if nargin==3
-    resampleIntervals = [];
-    plotTrials = false;
-elseif nargin==4
     plotTrials = false;
 end
 
@@ -119,12 +110,6 @@ nNotUpdated = NaN(nTrials,1);
 nBlink      = NaN(nTrials,1);
 D.percNoGaze = NaN(nTrials,1);
 D.analyzedGazeData = false(nTrials,1);
-if ~isempty(resampleIntervals) % [target preview, RT, MT, feedback]
-    resampleIntervals = repmat(resampleIntervals,nTrials/size(resampleIntervals,1),1); % repmat if single row
-    maxnsNew = max(resampleIntervals);
-    D.dirGaze_meanFix_resampled = {NaN(maxnsNew(1),nTrials,nTargets),NaN(maxnsNew(2),nTrials,nTargets),NaN(maxnsNew(3),nTrials,nTargets),NaN(maxnsNew(4),nTrials,nTargets)};
-    D.distGaze_meanFix_resampled = {NaN(maxnsNew(1),nTrials,1),NaN(maxnsNew(2),nTrials,1),NaN(maxnsNew(3),nTrials,1),NaN(maxnsNew(4),nTrials,1)};
-end
 fields_perc = {'atStart','outside','atPearl'};
 nCol_perc   = [1 1 length(pearlBinAngles)]; nDepth_perc = [1 1 nTargets];
 nCol_fix    = 16;
@@ -236,22 +221,7 @@ for t = 1 : nTrials
             
             %% Plot single trials - for example figure in paper
             
-            %[fig1] = plotSingleTrial(xyGaze,dirGaze_raw,fixation,distGood_fix,Exp,D,t,fig1);
-            
-            %% 4) Resample gaze data to normalized preview, RT, reach and post-reach duration
-            % To later compute probability of fixation in certain areas
-            
-            if ~isempty(resampleIntervals);
-                
-                dirGaze_resampled = resampleGazeIntervals(D.dirGaze_meanFix{t},...
-                    D.iTargetGoLeaveRingEnd(t,:),resampleIntervals(t,:));
-                distGaze_resampled = resampleGazeIntervals(D.distGaze_meanFix{t},...
-                    D.iTargetGoLeaveRingEnd(t,:),resampleIntervals(t,:));
-                
-                % create matrix with samples in rows, trials in columns, and targets in 3rd dimension
-                D.dirGaze_meanFix_resampled(:,t,1:nTargets) = dirGaze_resampled;
-                D.distGaze_meanFix_resampled(:,t) = distGaze_resampled;
-            end
+            %fig1 = plotSingleTrial(xyGaze,dirGaze_raw,fixation,distGood_fix,Exp,D,t,fig1);
             
             %% Loop over trial states
             
@@ -260,7 +230,7 @@ for t = 1 : nTrials
                 % current state
                 currState = previewReach(:,st);
                 
-                %% 5) Compute percentage of time that gaze is in each pearl bin
+                %% 4) Compute percentage of time that gaze is in each pearl bin
                 
                 if ~isnan(pearlBinAngles(1))
                     % relative to target 1
@@ -297,7 +267,7 @@ for t = 1 : nTrials
                     percTimeFix.(states{st}).outside(t,1) = percTime_max;
                 end
                 
-                %% 6) Create matrix with fixation angles relative to the target(s)
+                %% 5) Create matrix with fixation angles relative to the target(s)
                 
                 % get mean fixation angles and distances
                 dirGaze_meanFix_currState = D.dirGaze_meanFix{t}(currState,:);
@@ -353,7 +323,7 @@ for t = 1 : nTrials
                 
             end % end of loop over states
             
-            %% 7) Plot all fixations
+            %% 6) Plot all fixations
             
             if ~plotTrials && (D.percNoGaze(t)<50)
                 figure(fig1);clf
@@ -479,8 +449,8 @@ hitXY = Exp.targetDistance(t)*[sind(hitAngle) cosd(hitAngle)];
 
 % counter angles
 if Exp.cursorRotation(t)~=0
-    counter1Angle = Exp.target1Angle(t) - Exp.target1Rotation(t); % temp
-    counter2Angle = Exp.target2Angle(t) - Exp.target2Rotation(t); % temp
+    counter1Angle = Exp.target1Angle(t) - Exp.target1Rotation(t);
+    counter2Angle = Exp.target2Angle(t) - Exp.target2Rotation(t);
     counter1XY = Exp.targetDistance(t)*[sind(counter1Angle) cosd(counter1Angle)];
     counter2XY = Exp.targetDistance(t)*[sind(counter2Angle) cosd(counter2Angle)];
 else
@@ -496,7 +466,7 @@ plot(xyGaze(int_prev,1),xyGaze(int_prev,2),'.-','color',[0 0.5 0],'lineWidth',2)
 plot(xyGaze(int_RT,1),xyGaze(int_RT,2),'.-','color',fadedGreen1,'lineWidth',2);
 plot(xyGaze(int_rch,1),xyGaze(int_rch,2),'.-','color',fadedGreen2,'lineWidth',2);
 %plot(D.xyPen{t}(int,1),D.xyPen{t}(int,2),'c-'); % plot hand
-plot(D.xyCursor{t}(int,1),D.xyCursor{t}(int,2),'c.-'); % plot cursor
+plot(D.xyCursor{t}(int,1),D.xyCursor{t}(int,2),'co'); % plot cursor
 plot(Exp.target1XY(t,1),Exp.target1XY(t,2),'ro','markerfacecolor','r','markersize',8); % plot target 1
 plot([0 Exp.target1XY(t,1)],[0 Exp.target1XY(t,2)],'r');
 plot(Exp.target2XY(t,1),Exp.target2XY(t,2),'bo','markerfacecolor','b','markersize',8); % plot target 2

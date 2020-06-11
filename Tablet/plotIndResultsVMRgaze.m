@@ -394,8 +394,7 @@ if any(Results.analyzedGazeData)
                     legend('boxoff')
                 end
                 if round(b(c))==b(c)
-                    keyboard
-                    %title(blockNames{b(c)})
+                    title(ExpDetails(d).blockNames(b(c)))
                 end
             end
         end

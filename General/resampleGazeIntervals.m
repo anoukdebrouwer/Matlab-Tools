@@ -4,6 +4,7 @@ function [gaze_resampled] = resampleGazeIntervals(gaze,oldIntervals,newIntervals
 % MIT License
 % Copyright (c) 2020 Anouk de Brouwer
 
+gaze_resampled = [];
 for i = 1 : length(newIntervals)
     if newIntervals(i)>0
         int_old = oldIntervals(i):oldIntervals(i+1)-1;
@@ -12,6 +13,8 @@ for i = 1 : length(newIntervals)
         end
         int_new = linspace(int_old(1),int_old(end),newIntervals(i));
         % resample
-        gaze_resampled{i}(1:newIntervals(i)) = interp1(int_old,gaze(int_old),int_new);        
+        %gaze_resampled{i}(1:newIntervals(i)) = interp1(int_old,gaze(int_old),int_new);
+        gaze_new = interp1(int_old,gaze(int_old),int_new);
+        gaze_resampled = [gaze_resampled gaze_new];
     end
 end
