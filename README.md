@@ -47,7 +47,7 @@ set(gca,'XTickLabel',{'Length','Width'})
 <img src="/Images/meansWithDataPoints_example.png" width="500">
 
 ## rgb.m
-Get the rgb value of a color by name. By Kristjan Jonasson, retrieved form [Matlab File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/24497-rgb-triple-of-color-name-version-2)
+Get the rgb value of a color by name. By Kristjan Jonasson, retrieved form [Matlab File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/24497-rgb-triple-of-color-name-version-2).
 
 ## saveFigAsPDF.m
 Save the current figure as a pdf file. The file name, path, and font size are specified by the user. 
@@ -56,7 +56,7 @@ Save the current figure as a pdf file. The file name, path, and font size are sp
 Create a new figure window whose width and height are independently scaled by a factor relative to the default figure size.
 
 ## scatterWithLinearFit.m
-Create a scatter plot with a least-squares fitted line and a text box displaying the number of valid data points, correlation coefficient and corresponding p-value
+Create a scatter plot with a least-squares fitted line and a text box displaying the number of valid data points, correlation coefficient and corresponding p-value.
 
 Example:
 ```
