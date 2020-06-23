@@ -10,7 +10,7 @@ Draw error bars. By Jonathan C. Lansey, retrieved from [Matlab File Exchange](ht
 Get the x position of bars in a bar plot, e.g. for drawing error bars.
 
 ## horline.m
-Draw a horizontal line in the current figure.
+Draw a horizontal line at a specified location in the current figure.
 
 ## plotCorrelationMatrix.m
 Visualize the correlation between each two variables in the data as a colored cell in a correlation matrix, using a red-white-blue color gradient. Display the correlation coefficient in each cell with asterisks indicating the significance.
@@ -46,6 +46,9 @@ set(gca,'XTickLabel',{'Length','Width'})
 ```
 <img src="/Images/meansWithDataPoints_example.png" width="500">
 
+## rgb.m
+Get the rgb value of a color by name. By Kristjan Jonasson, retrieved form [Matlab File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/24497-rgb-triple-of-color-name-version-2)
+
 ## saveFigAsPDF.m
 Save the current figure as a pdf file. The file name, path, and font size are specified by the user. 
 
@@ -68,4 +71,4 @@ ylabel('Acceleration')
 Place a title, xlabel, or ylabel on a group of subplots. By Ben Barrowes, retrieved from [Matlab File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/7772-suplabel).
 
 ## vertline.m
-Draw a vertical line in the current figure.
+Draw a vertical line at a specified location in the current figure.
