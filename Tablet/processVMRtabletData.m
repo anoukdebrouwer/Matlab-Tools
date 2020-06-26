@@ -2,25 +2,25 @@ function processVMRtabletData(plotTrials)
 % processVMRtabletData  Process raw data from VMR experiments on tablet setup
 %
 % processVMRtabletData loads, processes, and visualizes hand and eye
-% movement data collected in a visuomotor rotation (VMR) experiment on a 
+% movement data collected in a visuomotor rotation (VMR) experiment on a
 % tablet setup at Queen's University:
 % - Wacom tablet with pen and Eyelink 1000 desktop tracker in Abramsky Hall
 % - Wacom tablet in mock MRI scanner in Craine Building
 % - custom MRI-compatible tablet and Eyelink 1000 remote tracker in fMRI scanner
 %
 % processVMRtabletData asks the user to specify a project folder and select
-% one or multiple participants or sessions. The raw data should be stored 
-% in a subfolder named '1_RawData', with a separate folder containing the 
-% raw data (one file per trial) of each participant and session. The 
+% one or multiple participants or sessions. The raw data should be stored
+% in a subfolder named '1_RawData', with a separate folder containing the
+% raw data (one file per trial) of each participant and session. The
 % function loads and cleans the data of each trial and saves a single
-% file per participant and session, containing a struct 'Exp' with 
-% information about the experiment and trials, and a struct 'D' with data. 
-% The processed data will be saved in a subfolder named '2_ProcessedData'. 
+% file per participant and session, containing a struct 'Exp' with
+% information about the experiment and trials, and a struct 'D' with data.
+% The processed data will be saved in a subfolder named '2_ProcessedData'.
 %
 % processVMRtabletData(TRUE) plots each trial separately for visual inspection
 % during processing, and waits for the user to click a button to continue
 % to the next trial. The plot contains a subplot of the xy position of the
-% stimuli, hand and gaze, and a subplot of the hand and gaze position over 
+% stimuli, hand and gaze, and a subplot of the hand and gaze position over
 % time.
 
 % MIT License
@@ -488,14 +488,18 @@ for s = 1 : nSubj
             iRing = iComplete;
         end
         
-        % keep trials that were categorized as 'Short' online
-        % but cursor reached the ring, if movement time was good
-        if ~isempty(iRing) && strcmpi(feedbackMessage{t},'Short')
-            MT = time_tr(iRing) - time_tr(iLeave);
-            if MT>maxMT(t)
+        % keep trials that were categorized as 'Short' online, but cursor
+        % reached the ring, if movement time was within the limit
+        if strcmpi(feedbackMessage{t},'Short')
+            if isempty(iRing) % cursor didn't reach the target
                 feedbackGood = false;
-            else
-                feedbackMessage{t} = 'Good';
+            else % cursor reached the target
+                MT = time_tr(iRing) - time_tr(iLeave);
+                if MT<maxMT(t)
+                    feedbackMessage{t} = 'Good';
+                else
+                    feedbackGood = false;
+                end
             end
         end
         
@@ -620,18 +624,19 @@ for s = 1 : nSubj
         
         %% Plot raw data of trials with good timing
         
-        if plotTrials
+        if plotTrials && cursorRotation(t)~=0
             d = targetDistance(t);
             MT = tTargetGoLeaveRingEnd(t,4)-tTargetGoLeaveRingEnd(t,3); % movement time
             % plot data in xy coordinates
             figure(fig1); %clf;
             subplot(1,2,1); cla
             int = iTarget:nanmin([iRing nSamples]); % interval from target onset to hit (or end of trial)
-            plot(d*sind(landmarkAngle),d*cosd(landmarkAngle),'ko'); hold on                             % plot ring of pearls
-            plot(landmarkRadius*sind(0:360),landmarkRadius*cosd(0:360),'k');                            % plot single ring
-            pg = plot(xyGaze(int,1),xyGaze(int,2),'.-','color',[0 0.5 0]);                      % plot gaze
+            plot(d*sind(landmarkAngle),d*cosd(landmarkAngle),'o','color',[0.5 0.5 0.5]); % plot ring of pearls
+            hold on
+            plot(landmarkRadius*sind(0:360),landmarkRadius*cosd(0:360),'k'); % plot single ring
+            pg = plot(xyGaze(int,1),xyGaze(int,2),'.-','color',[0 0.5 0]); % plot gaze
             if cursorVisible(t)
-                pc = plot(xyCursor(int,1),xyCursor(int,2),'.-','color','c');                        % plot cursor
+                pc = plot(xyCursor(int,1),xyCursor(int,2),'.-','color','c'); % plot cursor
             else
                 pc = plot(xyCursor(int,1),xyCursor(int,2),'.-','color','y');
             end
