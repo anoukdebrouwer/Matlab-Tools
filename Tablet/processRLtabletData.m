@@ -224,8 +224,8 @@ for s = 1 : nSubj
             y_norm = yTargetPath/targetDistance;
             x_norm = targetPathCurvature(b)*sin(pi*targetPathNumberOfCurves(b)*y_norm);
             xTargetPath = x_norm*targetDistance;
-            %xTargetPath_plot(:,b) = xTargetPath;
-            %yTargetPath_plot(:,b) = yTargetPath;
+            xTargetPath_plot(:,b) = xTargetPath;
+            yTargetPath_plot(:,b) = yTargetPath;
             xyTargetPath_plot = [xTargetPath yTargetPath];
             
             % get coordinates of visible path for plotting (finely sampled)
@@ -236,8 +236,8 @@ for s = 1 : nSubj
                 y_norm = yVisiblePath/targetDistance;
                 x_norm = visiblePathCurvature(b)*sin(pi*visiblePathNumberOfCurves(b)*y_norm);
                 xVisiblePath = x_norm*targetDistance;
-                %xVisiblePath_plot(:,b) = xVisiblePath;
-                %yVisiblePath_plot(:,b) = yVisiblePath;
+                xVisiblePath_plot(:,b) = xVisiblePath;
+                yVisiblePath_plot(:,b) = yVisiblePath;
                 xyVisiblePath_plot = [xVisiblePath yVisiblePath];
                 if isnan(visiblePathCurvature(b))
                     xyVisiblePath_plot = xyVisiblePath_plot*NaN;
@@ -488,9 +488,13 @@ for s = 1 : nSubj
     Exp.targetPathCurvature = targetPathCurvature;
     Exp.targetPathNumberOfCurves = targetPathNumberOfCurves;
     Exp.targetPathVisible = targetPathVisible;
+    Exp.xTargetPath_plot = xTargetPath_plot;
+    Exp.yTargetPath_plot = yTargetPath_plot;
     Exp.visiblePathCurvature = visiblePathCurvature;
     Exp.visiblePathNumberOfCurves = visiblePathNumberOfCurves;
     Exp.visiblePathVisible = visiblePathVisible;
+    Exp.xVisiblePath_plot = xVisiblePath_plot;
+    Exp.yVisiblePath_plot = yVisiblePath_plot;
     
     % data: feedback and timing
     D.time          = D.time(~feedbackTrial);
