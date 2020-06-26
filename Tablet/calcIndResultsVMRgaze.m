@@ -45,11 +45,10 @@ end
 nSubj = length(subjFiles);
 
 % load experiment details
-detailsFile = selectFiles([projectPath expFolder.name '/ExpDetails*.mat'],'files');
+detailsFile = dir([projectPath expFolder.name '/ExpDetails*.mat']);
 load([projectPath expFolder.name '/' detailsFile.name])
-nTrialBins = nTrials/8;
+nTrialBins = nTrials/nTargets;
 blocks = cellstr([repmat('block',nBlocks,1) num2str((1:nBlocks)')]);
-days = {'day1','day2'};
 if exist('breakTrials','var')
     if size(breakTrials,2)<nDays
         breakTrials = [breakTrials(:) breakTrials(:)];
@@ -57,6 +56,8 @@ if exist('breakTrials','var')
 else
     breakTrials = [];
 end
+days = {'day1','day2'};
+states = {'preview','reach'};
 
 if processData
     % open figure
