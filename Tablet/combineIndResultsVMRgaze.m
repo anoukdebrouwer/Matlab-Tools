@@ -113,11 +113,13 @@ for s = 1 : nSubj
     if any(outlierDiff(:));
         outlier = ~isnan(Results.explicitAngle) & ...
             (Results.explicitAngle ~= Results.explicitAngle_outliersRemoved);
-        [i,j] = find(outlier);
+        [tr,day] = find(outlier);
         % plot reported values and removed outliers
         figure(fig1); clf
         plot([Results.explicitAngle_outliersRemoved],'o'); hold on
-        plot(i,Results.explicitAngle(i,j),'kx');
+        for i = 1 : length(tr)
+            plot(tr(i),Results.explicitAngle(tr(i),day(i)),'kx');
+        end
         horline([-vmr,0,vmr])
         if nDays==2
             legend('Day1','Day2','outlier')
@@ -149,8 +151,10 @@ for s = 1 : nSubj
     
     % find first bin in which an aiming strategy was present
     firstRotBin = find(rotBins,1);
-    firstAimFixBin(s) = nanmax([find(aimFixAngle(firstRotBin:end,s,1)<0,1) NaN]);
-    firstAimReportBin(s) = nanmax([find(reportAngle(firstRotBin:end,s,1)<0,1) NaN]);
+    bin1 = pearlNumAngle(2,2);
+    if vmr>0; bin1 = -bin1; end
+    firstAimFixBin(s) = nanmax([find(aimFixAngle(firstRotBin:end,s,1)<=bin1,1) NaN]);
+    firstAimReportBin(s) = nanmax([find(reportAngle(firstRotBin:end,s,1)<=bin1,1) NaN]);
     
 end % end of loop over subjects
 
@@ -169,7 +173,7 @@ end
 % save file
 if overwrite == 1
     save([saveToPath fileName],'subj','blockNames','blockNo','iBin','nTrials',...
-        'cursorRotation','meanOrMedian','RT','handAngle','aimFixAngle',...
+        'cursorRotation','meanOrMedian','RT','handAngle','aimFixAngle','aimFixAngle_opp',...
         'reportAngle','implicitAngle','implicitAngle_fromFix','firstAimReportBin','firstAimFixBin');
     disp(['Saved ' saveToPath fileName])
     
@@ -189,45 +193,83 @@ if mod(length(iRotationOnOff),2)
 end
 iNewBlock = find(diff(Results.blockNo(:,1))) + 0.5;
 
+% colors
+colors = brewermap(10,'Paired');
+colors = colors([1,2,5,6,3,4,9,10],:); % blue, red, green, purple
+
 % plot
-scaledFigure(1.5,0.75*nDays);
-for d = 1 : nDays
-    subplot(nDays,1,d); hold on
-    xlim([0 iMidBin(end)+1]); set(gca,'XTick',0:80:nTrials)
-    ylim([-2*vmr +vmr]); yl = ylim; set(gca,'Ytick',-180:45:180)
-    % color background when rotation is on, works in R2015b but not in 2017a
-    for r = 1 : length(iRotationOnOff)/2
-        x = iRotationOnOff(r*2-1:r*2);
-        a = area([x; flipud(x)],[yl(1) yl(1) yl(2) yl(2)],'LineStyle','none');
-        a.FaceColor = [0.95 0.95 0.95];
-    end
-    plot([0 nTrials],[0 0],'k'); % draw line at zero
-    plot([0 nTrials],[-vmr -vmr],'k'); % draw line at hand target angle
-    % plot learning curves
-    pt = plot(iMidBin,handAngle(:,:,d));
-    % axes and lables
-    hold off
-    vertline(breakTrials,'g:')
-    vertline(iNewBlock,'k:')
-    xlabel('Trial')
-    ylabel('Angle (deg)')
-    if nDays==2
-        if d==1
-            title('Day 1')
-        elseif d==2
-            title('Day 2')
+scaledFigure(nDays*0.75,0.5*4);
+subplotNo = 1;
+for i = 1 : 4
+    for d = 1 : nDays
+        subplot(4,nDays,subplotNo); hold on
+        xlim([0 iMidBin(end)+1]); set(gca,'XTick',0:80:nTrials)
+        ylim([-2*vmr +vmr]); yl = ylim; set(gca,'Ytick',-180:45:180)
+        % color background when rotation is on, works in R2015b but not in 2017a
+        for r = 1 : length(iRotationOnOff)/2
+            x = iRotationOnOff(r*2-1:r*2);
+            a = area([x; flipud(x)],[yl(1) yl(1) yl(2) yl(2)],'LineStyle','none');
+            a.FaceColor = [0.95 0.95 0.95];
         end
+        plot([0 nTrials],[0 0],'k'); % draw line at zero
+        plot([0 nTrials],[-vmr -vmr],'k'); % draw line at hand target angle
+        % plot learning curves
+        if i==1
+            plot(iMidBin,handAngle(:,:,d),'.-','color',colors(1,:));
+            plot(iMidBin,nanmean(handAngle(:,:,d),2),'.-','color',colors(2,:),'linewidth',2);
+            figTitle = 'Hand angle';
+        elseif i==2
+            plot(iMidBin,reportAngle(:,:,d),'.-','color',colors(3,:));
+            plot(iMidBin,nanmean(reportAngle(:,:,d),2),'.-','color',colors(4,:),'linewidth',2);
+            figTitle = 'Report angle';
+        elseif i==3
+            plot(iMidBin,aimFixAngle(:,:,d),'.-','color',colors(7,:));
+            plot(iMidBin,aimFixAngle_opp(:,:,d),'.-','color',colors(7,:));
+            mAimFixAngle = nanmean([aimFixAngle(:,:,d) aimFixAngle_opp(:,:,d)],2);
+            plot(iMidBin,mAimFixAngle,'.-','color',colors(8,:),'linewidth',2);
+            nAimFixators = sum(~isnan(aimFixAngle(:,:,d)),2);
+            str = ['max n = ' num2str(max(nAimFixators))];
+            text(iMidBin(firstRotBin),0.5*vmr,str)
+            figTitle = 'Aimpoint fixation angle';
+        elseif i==4
+            % from report
+            plot(iMidBin,implicitAngle(:,:,d),'.-','color',colors(5,:));
+            mImplAngle = nanmean(implicitAngle(:,:,d),2);
+            pr = plot(iMidBin,mImplAngle,'.-','color',colors(6,:),'linewidth',2);
+            % from fixations
+            implicitAngle_fromFix(~isnan(mImplAngle),:,d) = NaN;
+            plot(iMidBin,implicitAngle_fromFix(:,:,d),'.--','color',colors(5,:));
+            mImplAngle_fromFix = nanmean(implicitAngle_fromFix(:,:,d),2);
+            pf = plot(iMidBin,mImplAngle_fromFix,'.--','color',colors(6,:),'linewidth',2);
+            figTitle = 'Implicit angle';
+            if d==1 && sum(~isnan(mImplAngle))>1 && sum(~isnan(mImplAngle_fromFix))>1
+                legend([pr pf],{'from report','from fixation'},'Location','best','Orientation','horizontal');
+            end
+        end
+        % axes and lables
+        hold off
+        vertline(breakTrials,':','color',[0.7 0.7 0.7])
+        vertline(iNewBlock,'k:')
+        if i==4
+            xlabel('Trial')
+        end
+        if d==1
+            ylabel('Angle (deg)')
+        end
+        if nDays==1
+            title(figTitle)
+        elseif nDays==2
+            %title(['Day ' num2str(d) ' - ' figTitle])
+            title([figTitle ' [day ' num2str(d) ']' ])
+        end
+        subplotNo = subplotNo+1;
     end
 end
-figTitle = [expFolder.name ' - Hand angles of all partipants (n=' num2str(nSubj) ')'];
-if nDays==2
-    suplabel(figTitle,'t');
-else
-    title(figTitle,'interpreter','none');
-end
+figTitle = [expFolder.name ' - group results (n=' num2str(nSubj) ')'];
+suplabel(figTitle,'t');
 
 % save figure
-figName = [expFolder.name '_binnedHandAngles'];
+figName = [expFolder.name '_binnedAngles'];
 if exist([saveToPath figName],'file') == 2 % check if file does not exist yet
     disp(['A figure named ' figName ' already exists.'])
     overwrite = input('Do you want to overwrite it? Yes(1) or no(0): ');
