@@ -109,26 +109,6 @@ for s = 1 : nSubj
         fixAngle_preview_closestA   = NaN(nTrials,nDays);
         fixAngle_preview_closestOppA = NaN(nTrials,nDays);
         iFixTarget_aimFix_rot       = NaN(nTrials,nDays);
-        mnBinnedHitAngle_cursor     = NaN(nTrialBins,nDays);
-        medBinnedHitAngle_cursor    = NaN(nTrialBins,nDays);
-        sdBinnedHitAngle_cursor     = NaN(nTrialBins,nDays);
-        mnBinnedHitAngle_hand       = NaN(nTrialBins,nDays);
-        medBinnedHitAngle_hand      = NaN(nTrialBins,nDays);
-        sdBinnedHitAngle_hand       = NaN(nTrialBins,nDays);
-        mnBinnedRT                  = NaN(nTrialBins,nDays);
-        medBinnedRT                 = NaN(nTrialBins,nDays);
-        sdBinnedRT                  = NaN(nTrialBins,nDays);
-        mnBinnedExplicitAngle       = NaN(nTrialBins,nDays);
-        medBinnedExplicitAngle      = NaN(nTrialBins,nDays);
-        sdBinnedExplicitAngle       = NaN(nTrialBins,nDays);
-        mnBinnedExplicitAngle_outliersRemoved = NaN(nTrialBins,nDays);
-        sdBinnedExplicitAngle_outliersRemoved = NaN(nTrialBins,nDays);
-        mnBinnedFixAngle_preview_closestA = NaN(nTrialBins,nDays);
-        medBinnedFixAngle_preview_closestA = NaN(nTrialBins,nDays);
-        sdBinnedFixAngle_preview_closestA = NaN(nTrialBins,nDays);
-        mnBinnedFixAngle_preview_closestOppA = NaN(nTrialBins,nDays);
-        medBinnedFixAngle_preview_closestOppA = NaN(nTrialBins,nDays);
-        sdBinnedFixAngle_preview_closestOppA = NaN(nTrialBins,nDays);
         %figure(fig0);clf
         
         %% Loop over days
@@ -355,67 +335,12 @@ for s = 1 : nSubj
             
             fprintf('\n')
         end % end of loop over days
-        
-        %% Bin cursor and hand angle, explicit angle and fixation angle
-        
+     
         % remove report trials from RT and MT
         RT_all = RT;
         RT(~noReport) = NaN;
         MT_all = MT;
         MT(~noReport) = NaN;
-        
-        % angular error and report averaged in 8 trial bins
-        nTrials = length(hitAngle_cursor);
-        iBin = 1 : 8 : nTrials+1;
-        for b = 1 : length(iBin)-1
-            % cursor hit angle
-            a = hitAngle_cursor(iBin(b):iBin(b+1)-1,:);
-            mnBinnedHitAngle_cursor(b,:) = nanmean(a);
-            medBinnedHitAngle_cursor(b,:) = nanmedian(a);
-            sdBinnedHitAngle_cursor(b,:) = nanstd(a);
-            % hand hit angle
-            a = hitAngle_hand(iBin(b):iBin(b+1)-1,:);
-            mnBinnedHitAngle_hand(b,:) = nanmean(a);
-            medBinnedHitAngle_hand(b,:) = nanmedian(a);
-            sdBinnedHitAngle_hand(b,:) = nanstd(a);
-            % RT
-            a = RT(iBin(b):iBin(b+1)-1,:);
-            mnBinnedRT(b,:) = nanmean(a);
-            medBinnedRT(b,:) = nanmedian(a);
-            sdBinnedRT(b,:) = nanstd(a);
-            % report angle
-            a = explicitAngle(iBin(b):iBin(b+1)-1,:);
-            mnBinnedExplicitAngle(b,:) = nanmean(a);
-            medBinnedExplicitAngle(b,:) = nanmedian(a);
-            sdBinnedExplicitAngle(b,:) = nanstd(a);
-            a = explicitAngle_outliersRemoved(iBin(b):iBin(b+1)-1,:);
-            mnBinnedExplicitAngle_outliersRemoved(b,:) = nanmean(a);
-            sdBinnedExplicitAngle_outliersRemoved(b,:) = nanstd(a);
-            % fixation angle closest to ideal aimpoint - during preview
-            if any(blockNumber(iBin(b),:)>=rotBlockNumber) % rotation or washout block
-                a = fixAngle_preview_closestA(iBin(b):iBin(b+1)-1,:);
-                a(:,sum(~isnan(a))==1) = NaN;  % do not compute mean when there is only 1 value
-                mnBinnedFixAngle_preview_closestA(b,:) = nanmean(a);
-                medBinnedFixAngle_preview_closestA(b,:) = nanmedian(a);
-                sdBinnedFixAngle_preview_closestA(b,:) = nanstd(a);
-                a = fixAngle_preview_closestOppA(iBin(b):iBin(b+1)-1,:);
-                a(:,sum(~isnan(a))==1) = NaN;  % do not compute mean when there is only 1 value
-                mnBinnedFixAngle_preview_closestOppA(b,:) = nanmean(a);
-                medBinnedFixAngle_preview_closestOppA(b,:) = nanmedian(a);
-                sdBinnedFixAngle_preview_closestOppA(b,:) = nanstd(a);
-            end
-        end
-        iBin = iBin(1:end-1)';
-        
-        %% Compute implicit angle
-        
-        % subtraction of explicit from hand angle
-        mnBinnedImplicitAngle = mnBinnedHitAngle_hand - mnBinnedExplicitAngle;
-        mnBinnedImplicitAngle_fix = mnBinnedHitAngle_hand - mnBinnedFixAngle_preview_closestA;
-        if ~isempty(washoutBlockNumber)
-            bin_WO = find(blockNumber(iBin,1)==washoutBlockNumber);
-            mnBinnedImplicitAngle_fix(bin_WO,:) = mnBinnedHitAngle_hand(bin_WO,:) - mnBinnedFixAngle_preview_closestOppA(bin_WO,:);
-        end
         
         %% Save individual results
         
@@ -446,31 +371,6 @@ for s = 1 : nSubj
             Results.probFix_blocks = probFix_blocks;
             Results.probFix_subblocks = probFix_subblocks;
         end
-        % binned data
-        Results.blockNo_bins = blockNumber(iBin,:);
-        Results.trialNo_bins = [trialNumber(iBin,:) iBin];
-        Results.mnBinnedHitAngle_cursor = mnBinnedHitAngle_cursor;
-        Results.medBinnedHitAngle_cursor = medBinnedHitAngle_cursor;
-        Results.sdBinnedHitAngle_cursor = sdBinnedHitAngle_cursor;
-        Results.mnBinnedHitAngle_hand = mnBinnedHitAngle_hand;
-        Results.medBinnedHitAngle_hand = medBinnedHitAngle_hand;
-        Results.sdBinnedHitAngle_hand = sdBinnedHitAngle_hand;
-        Results.mnBinnedRT = mnBinnedRT;
-        Results.medBinnedRT = medBinnedRT;
-        Results.sdBinnedRT = sdBinnedRT;
-        Results.mnBinnedExplicitAngle = mnBinnedExplicitAngle;
-        Results.medBinnedExplicitAngle = medBinnedExplicitAngle;
-        Results.sdBinnedExplicitAngle = sdBinnedExplicitAngle;
-        Results.mnBinnedExplicitAngle_outliersRemoved = mnBinnedExplicitAngle_outliersRemoved;
-        Results.sdBinnedExplicitAngle_outliersRemoved = sdBinnedExplicitAngle_outliersRemoved;
-        Results.mnBinnedImplicitAngle = mnBinnedImplicitAngle;
-        Results.mnBinnedImplicitAngle_fix = mnBinnedImplicitAngle_fix;
-        Results.mnBinnedFixAngle_closestA = mnBinnedFixAngle_preview_closestA;
-        Results.medBinnedFixAngle_closestA = medBinnedFixAngle_preview_closestA;
-        Results.sdBinnedFixAngle_closestA = sdBinnedFixAngle_preview_closestA;
-        Results.mnBinnedFixAngle_closestOppA = mnBinnedFixAngle_preview_closestOppA;
-        Results.medBinnedFixAngle_closestOppA = medBinnedFixAngle_preview_closestOppA;
-        Results.sdBinnedFixAngle_closestOppA = sdBinnedFixAngle_preview_closestOppA;
         % criteria for reach and gaze analysis
         maxRT = unique(Exp.timing.maxRT);
         if length(maxRT)==1

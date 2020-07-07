@@ -1,11 +1,10 @@
-function combineIndResultsVMRgaze(meanOrMedian)
-% combineIndResultsVMRgaze Combine individual binned data of VMR gaze
-% experiments into a group data file.
+function combineIndResultsVMRgaze(meanOrMedian,createPlots)
+% combineIndResultsVMRgaze Bin individual data of VMR gaze experiments and
+% combine into a group data file.
 %
 % combineResultsVMRgaze loads the individual data files and creates and
 % saves matrices with the binned hand angle, reported aiming angle, aim
-% fixation angle, and implicit angle for all participants. It also creates
-% and saves a figure with the individual learning curves (hand angles).
+% fixation angle, and implicit angle for all participants.
 %
 % For 2-day experiments, it is assumed that the experimental blocks on both
 % days are identical (although day 2 doesn't need to include all day-1 blocks).
@@ -15,6 +14,7 @@ function combineIndResultsVMRgaze(meanOrMedian)
 
 if nargin==0
     meanOrMedian = 1;
+    createPlots = false;
 end
 
 % select experiment data folder
@@ -44,12 +44,15 @@ fig1 = figure;
 
 % preallocate
 RT                      = NaN(nBins,nSubj,nDays);
+sdRT                    = NaN(nBins,nSubj,nDays);
+cursorAngle             = NaN(nBins,nSubj,nDays);
+sdCursorAngle           = NaN(nBins,nSubj,nDays);
 handAngle               = NaN(nBins,nSubj,nDays);
+sdHandAngle             = NaN(nBins,nSubj,nDays);
 reportAngle             = NaN(nBins,nSubj,nDays);
+aimFixAngle             = NaN(nBins,nSubj,nDays);
 implicitAngle           = NaN(nBins,nSubj,nDays);
 implicitAngle_fromFix   = NaN(nBins,nSubj,nDays);
-aimFixAngle             = NaN(nBins,nSubj,nDays);
-aimFixAngle_opp         = NaN(nBins,nSubj,nDays);
 firstAimReportBin       = NaN(nSubj,1);
 firstAimFixBin          = NaN(nSubj,1);
 
@@ -69,47 +72,61 @@ for s = 1 : nSubj
         rotBins = cursorRotation ~= 0;
         woBlock = find(ismember(lower(blockNames),'washout'));
         woBins = blockNo==woBlock;
+        targetZone = Results.fixAngles.day1.preview.targetZone;
     end
     
-    % check if means and medians of bins were calculated
-    % (older data only has means)
-    if ~isfield(Results,'mnBinnedRT')
-        meanOrMedian = 1;
-        Results.mnBinnedRT = Results.binnedRT;
-        Results.mnBinnedHitAngle_hand = Results.binnedHitAngle_hand;
-        Results.mnBinnedFixAngle_closestA = Results.binnedFixAngle_closestA;
-        Results.mnBinnedFixAngle_closestOppA = Results.binnedFixAngle_closestOppA;
-        Results.mnBinnedExplicitAngle = Results.binnedExplicitAngle;
-        Results.mnBinnedExplicitAngle_outliersRemoved = Results.binnedExplicitAngle_outliersRemoved;
-    end
+    %% Bin reaction time, cursor angle, hand angle, report angle, and fixation angle
     
-    %% Fill matrix with binned data
+    reportAngle_all = NaN(nBins,nDays);
+    reportAngle_noOutliers = NaN(nBins,nDays);
     
-    if meanOrMedian==1 % get means
-        RT(:,s,:) = Results.mnBinnedRT;
-        handAngle(:,s,:) = Results.mnBinnedHitAngle_hand;
-        if any(Results.analyzedGazeData(:))
-            aimFixAngle(rotBins,s,:) = Results.mnBinnedFixAngle_closestA(rotBins,:);
-            aimFixAngle_opp(woBins,s,:) = Results.mnBinnedFixAngle_closestOppA(woBins,:);
+    % loop over bins
+    iBin = 1 : nTargets : nTrials+1;
+    for b = 1 : length(iBin)-1
+        % get all values in bin
+        rt = Results.RT(iBin(b):iBin(b+1)-1,:);                 % reaction time
+        ca = Results.hitAngle_cursor(iBin(b):iBin(b+1)-1,:);    % cursor hit angle
+        ha = Results.hitAngle_hand(iBin(b):iBin(b+1)-1,:);      % hand hit angle
+        ra_all = Results.explicitAngle(iBin(b):iBin(b+1)-1,:);  % reported aiming angle
+        ra_no = Results.explicitAngle_outliersRemoved(iBin(b):iBin(b+1)-1,:);
+        % get all aim fixation angles in bin
+        fa = NaN;
+        if rotBins(b)
+            fa = Results.fixAngle_closestA(iBin(b):iBin(b+1)-1,:);
+        elseif woBins(b)
+            fa = Results.fixAngle_closestOppA(iBin(b):iBin(b+1)-1,:);
         end
-    else % get medians
-        RT(:,s,:) = Results.medBinnedRT;
-        handAngle(:,s,:) = Results.medBinnedHitAngle_hand;
-        if any(Results.analyzedGazeData(:))
-            aimFixAngle(rotBins,s,:) = Results.medBinnedFixAngle_closestA(rotBins,:);
-            aimFixAngle_opp(woBins,s,:) = Results.medBinnedFixAngle_closestOppA(woBins,:);
+        fa(:,sum(~isnan(fa))==1) = NaN;  % do not compute mean when there is only 1 value
+        % calculate bin mean or median
+        if meanOrMedian==1
+            RT(b,s,:) = nanmean(rt);
+            cursorAngle(b,s,:) = nanmean(ca);
+            handAngle(b,s,:) = nanmean(ha);
+            reportAngle_all(b,:) = nanmean(ra_all);
+            reportAngle_noOutliers(b,:) = nanmean(ra_no);
+            aimFixAngle(b,s,:) = nanmean(fa);
+        elseif meanOrMedian==2
+            RT(b,s,:) = nanmedian(rt);
+            cursorAngle(b,s,:) = nanmedian(ca);
+            handAngle(b,s,:) = nanmedian(ha);
+            reportAngle_all(b,s,:) = nanmedian(ra_all);
+            reportAngle_noOutliers(b,s,:) = nanmedian(ra_no);
+            aimFixAngle(b,s,:) = nanmedian(fa);
         end
+        % calculate bin standard deviation
+        sdRT(b,s,:) = nanstd(rt);
+        sdCursorAngle(b,s,:) = nanstd(ca);
+        sdHandAngle(b,s,:) = nanstd(ha);
     end
+    iBin = iBin(1:end-1)';
     
-    % check removed outliers in reported aiming angles
+    % create separate aim fixation variables for rotation and washout?
+    
+    %% Check removed outliers in reported aiming angles
+    
     keepOutliers = false;
-    if meanOrMedian==1
-        outlierDiff = ~isnan(Results.mnBinnedExplicitAngle) & ...
-            (Results.mnBinnedExplicitAngle ~= Results.mnBinnedExplicitAngle_outliersRemoved);
-    else
-        outlierDiff = ~isnan(Results.medBinnedexplicitAngle) & ...
-            (Results.medBinnedExplicitAngle ~= Results.medBinnedExplicitAngle_outliersRemoved);
-    end
+    outlierDiff = ~isnan(reportAngle_noOutliers) & ...
+        (reportAngle_all ~= reportAngle_noOutliers);
     if any(outlierDiff(:));
         outlier = ~isnan(Results.explicitAngle) & ...
             (Results.explicitAngle ~= Results.explicitAngle_outliersRemoved);
@@ -130,31 +147,29 @@ for s = 1 : nSubj
         keepOutliers = input('Discard(0) or keep(1) outliers? ');
     end
     if keepOutliers
-        if meanOrMedian==1
-            reportAngle(:,s,:) = Results.mnBinnedExplicitAngle;
-        else
-            reportAngle(:,s,:) = Results.medBinnedExplicitAngle;
-        end
+        reportAngle(:,s,:) = reportAngle_all;
         keyboard
     else
-        if meanOrMedian==1
-            reportAngle(:,s,:) = Results.mnBinnedExplicitAngle_outliersRemoved;
-        else
-            reportAngle(:,s,:) = Results.medBinnedExplicitAngle_outliersRemoved;
-        end
+        reportAngle(:,s,:) = reportAngle_noOutliers;
     end
     
-    % calculate implicit angle
-    implicitAngle(:,s,:) = handAngle(:,s,:)-reportAngle(:,s,:);
-    implicitAngle_fromFix(rotBins,s,:) = handAngle(rotBins,s,:)-aimFixAngle(rotBins,s,:);
-    implicitAngle_fromFix(woBins,s,:) = handAngle(woBins,s,:)-aimFixAngle_opp(woBins,s,:);
+    %% Calculate implicit angle
     
-    % find first bin in which an aiming strategy was present
+    implicitAngle(:,s,:) = handAngle(:,s,:)-reportAngle(:,s,:);
+    implicitAngle_fromFix(:,s,:) = handAngle(:,s,:)-aimFixAngle(:,s,:);
+    
+    %% Trials and bins in which an aiming strategy was present
+    
+    % first rotation bin in which an aiming strategy was present
     firstRotBin = find(rotBins,1);
-    bin1 = pearlNumAngle(2,2);
-    if vmr>0; bin1 = -bin1; end
-    firstAimFixBin(s) = nanmax([find(aimFixAngle(firstRotBin:end,s,1)<=bin1,1) NaN]);
-    firstAimReportBin(s) = nanmax([find(reportAngle(firstRotBin:end,s,1)<=bin1,1) NaN]);
+    firstAimFixBin(s) = nanmax([find(aimFixAngle(firstRotBin:end,s,1)<targetZone(1),1) NaN]);
+    firstAimReportBin(s) = nanmax([find(reportAngle(firstRotBin:end,s,1)<targetZone(1),1) NaN]);
+    
+    %% Plots
+    
+    if createPlots
+        %
+    end
     
 end % end of loop over subjects
 
