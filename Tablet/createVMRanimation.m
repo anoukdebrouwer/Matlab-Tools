@@ -31,6 +31,7 @@ cursorRadius = Exp.stim.cursorRadius;
 gazeRadius = cursorRadius/2;
 pearlAngle = Exp.pearlNumAngle(:,2);
 pearlRadius = 3;
+pearlXY = [targetDistance*cosd(pearlAngle) targetDistance*sind(pearlAngle)];
 nPearls = length(pearlAngle);
 
 %% Open video file
@@ -69,7 +70,7 @@ for t = trials
     time_new = time_tr_(i_new)-time_tr_(i_new(1));
     trialState_new = trialState_(i_new);
     % resample
-    time_r = (time_new(1):1/fs:time_new(end))';
+    time_r = (time_new(1):1/fs:time_new(end))'; % multiply fs by two to save at 50% speed
     xyCursor_r = interp1(time_new,xy_new(:,1:2),time_r);
     dCursor_r = sqrt(xyCursor_r(:,1).^2 + xyCursor_r(:,2).^2);
     xyGaze_r = interp1(time_new,xy_new(:,3:4),time_r);
@@ -82,7 +83,7 @@ for t = trials
     iHit = iHit(dHit==min(dHit));
     iTarget = find(trialState_r==6,1);
     iGO = find(trialState_r==7,1);
-    if plotGaze && any(isnan(xyGaze_r(iTarget:iHit,:)))
+    if plotGaze && any(any(isnan(xyGaze_r(iTarget:iHit,:))))
         disp('Trial contains blink, discard')
         keyboard
     end
@@ -90,10 +91,11 @@ for t = trials
     
     % plot pearls, start, and cursor
     for p = 1 : nPearls
-        prls(p) = rectangle('Position',[targetDistance*cosd(pearlAngle(p))-pearlRadius targetDistance*sind(pearlAngle(p))-pearlRadius pearlRadius*2 pearlRadius*2],...
-            'Curvature',[1 1],'EdgeColor',[0.5 0.5 0.5]);
+        prls(p) = rectangle('Position',[pearlXY(p,1)-pearlRadius...
+            pearlXY(p,2)-pearlRadius pearlRadius*2 pearlRadius*2],...
+            'Curvature',[1 1],'EdgeColor',[0.8 0.8 0.8]);
     end
-    strt = rectangle('Position',[0-startRadius 0-startRadius startRadius*2 startRadius*2],...          % start
+    strt = rectangle('Position',[0-startRadius 0-startRadius startRadius*2 startRadius*2],... % start
         'Curvature',[1 1],'EdgeColor','none','FaceColor','w');
     trgt = rectangle('Position',[targetXY-targetRadius targetRadius*2 targetRadius*2],...
         'Curvature',[1 1],'LineWidth',2,'EdgeColor','none','FaceColor','none'); % target
@@ -146,7 +148,9 @@ for t = trials
     while i<nSamples
         if plotGaze
             gz.FaceColor = 'y';
-            gz.Position = [xyGaze_r(i,:)-gazeRadius gazeRadius*2 gazeRadius*2];
+            if ~(any(isnan(xyGaze_r(i,:))))
+                gz.Position = [xyGaze_r(i,:)-gazeRadius gazeRadius*2 gazeRadius*2];
+            end
         end
         M(i+ni) = getframe(gcf);
         writeVideo(v,M(i+ni))
