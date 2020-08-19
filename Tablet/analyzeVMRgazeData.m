@@ -171,7 +171,7 @@ for t = 1 : nTrials
         
         %% 2) Detect saccades and fixations
         
-        plotOnOff = false;
+        plotOnOff = true;
         % if gaze data is recorded during at least half of the relevant trial states
         if D.percNoGaze(t) < 50
             D.analyzedGazeData(t) = true;
@@ -183,7 +183,7 @@ for t = 1 : nTrials
             if plotOnOff
                 xlim([0 length(xyvpGaze)])
                 vertline(find(diff(preview)),'k'); vertline(find(diff(reach)),'k');
-                waitforbuttonpress
+                keyboard; waitforbuttonpress
             end
             noSaccade = true(length(xyGaze),1);
             if onsets>=1
@@ -221,7 +221,7 @@ for t = 1 : nTrials
             
             %% Plot single trials - for example figure in paper
             
-            %fig1 = plotSingleTrial(xyGaze,dirGaze_raw,fixation,distGood_fix,Exp,D,t,fig1);
+            % fig1 = plotSingleTrial(xyGaze,dirGaze_raw,fixation,distGood_fix,Exp,D,t,fig1);
             
             %% Loop over trial states
             
@@ -325,16 +325,17 @@ for t = 1 : nTrials
             
             %% 6) Plot all fixations
             
-            if ~plotTrials && (D.percNoGaze(t)<50)
-                figure(fig1);clf
-                iState = [iPreviewStartEnd iReachStartEnd];
-                stateColors = {'k','k','k','k'};
-                fixColors = [repmat({'g--'},1,size(iFixStartEnd,1)) repmat({'r--'},1,size(iFixStartEnd,1))];
-                subplot3([xyGaze(:,1) xyGaze(:,2) dirGaze(:,reachTarget(t))],[0 length(xyGaze)+1],...
-                    [-minMaxDistance(t,2) minMaxDistance(t,2); -minMaxDistance(t,2) minMaxDistance(t,2); -90 90],...
-                    [iState(:)' iFixStartEnd(:)'],[stateColors fixColors],t)
-                horline(0)
-                keyboard %waitforbuttonpress
+            if plotTrials && (D.percNoGaze(t)<50)
+                %%% code needs to be updated
+                % figure(fig1);clf
+                % iState = [iPreviewStartEnd iReachStartEnd];
+                % stateColors = {'k','k','k','k'};
+                % fixColors = [repmat({'g--'},1,size(iFixStartEnd,1)) repmat({'r--'},1,size(iFixStartEnd,1))];
+                % subplot3([xyGaze(:,1) xyGaze(:,2) dirGaze(:,reachTarget(t))],[0 length(xyGaze)+1],...
+                %     [-minMaxDistance(t,2) minMaxDistance(t,2); -minMaxDistance(t,2) minMaxDistance(t,2); -90 90],...
+                %     [iState(:)' iFixStartEnd(:)'],[stateColors fixColors],t)
+                % horline(0)
+                % keyboard %waitforbuttonpress
             end
             
         end
