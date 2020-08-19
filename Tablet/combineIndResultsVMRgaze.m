@@ -29,7 +29,10 @@ saveToPath = [projectPath expFolder.name '/3_Results/'];
 cd(dataPath)
 
 % select subject data files
-subjFiles = selectFiles('*.mat');
+subjFiles = selectFiles('S*.mat');
+if isempty(subjFiles)
+    subjFiles = selectFiles('*.mat');
+end
 nSubj = length(subjFiles);
 subj = cell(1,nSubj);
 
@@ -41,6 +44,7 @@ vmr = visuomotorRotation;
 
 % open figures
 fig1 = figure;
+matlabcolors = get(gca,'colororder');
 
 % preallocate
 RT                      = NaN(nBins,nSubj,nDays);
@@ -159,6 +163,37 @@ for s = 1 : nSubj
     implicitAngle_fromFix(:,s,:) = handAngle(:,s,:)-aimFixAngle(:,s,:);
     
     %% Trials and bins in which an aiming strategy was present
+    
+    % percentage of trials in which an aiming strategy was present
+    reportTrial = ismember(Results.trialType,'report');
+    for d = 1 : nDays
+        for b = 1 : nBlocks
+            % all trials
+            currBlock = Results.blockNo(:,d)==b & Results.feedbackAndMTgood(:,d);
+            strategy = Results.explicitAngle(currBlock,d)<targetZone(1) | ...
+                Results.fixAngle_closestA(currBlock,d)<targetZone(1);
+            percStrategy(b,s,d) = sum(strategy)/sum(currBlock)*100;
+            strategy_opp = Results.explicitAngle(currBlock,d)>targetZone(2) | ...
+                Results.fixAngle_closestOppA(currBlock,d)>targetZone(2);
+            percStrategy_opp(b,s,d) = sum(strategy_opp)/sum(currBlock)*100;
+            % report trials
+            currBlock_report = Results.blockNo(:,d)==b & Results.feedbackAndMTgood(:,d) & reportTrial(:,d);
+            if any(currBlock_report)
+                reportStrategy = Results.explicitAngle(currBlock_report,d)<targetZone(1);
+                percReportStrategy(b,s,d) = sum(reportStrategy)/sum(currBlock_report)*100;
+                reportStrategy_opp = Results.explicitAngle(currBlock_report,d)>targetZone(2);
+                percReportStrategy_opp(b,s,d) = sum(reportStrategy_opp)/sum(currBlock_report)*100;
+            end
+            % no-report trials, look at fixation angles
+            currBlock_fix = Results.blockNo(:,d)==b & Results.feedbackAndMTgood(:,d) & ~reportTrial(:,d);
+            if any(currBlock_fix)
+                fixationStrategy = Results.fixAngle_closestA(currBlock_fix,d)<targetZone(1);
+                percFixStrategy(b,s,d) = sum(fixationStrategy)/sum(currBlock_fix)*100;
+                fixationStrategy_opp = Results.fixAngle_closestOppA(currBlock_fix,d)>targetZone(2);
+                percFixStrategy_opp(b,s,d) = sum(fixationStrategy_opp)/sum(currBlock_fix)*100;
+            end
+        end
+    end
     
     % first rotation bin in which an aiming strategy was present
     firstRotBin = find(rotBins,1);
