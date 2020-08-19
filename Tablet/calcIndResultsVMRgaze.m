@@ -122,7 +122,7 @@ for s = 1 : nSubj
                 fileName = subjFiles(s).name;
             end
             load([dataPath fileName]);
-            fprintf('Loaded %s',fileName)
+            fprintf('Loaded %s\n',fileName)
             Exp.breakTrials = breakTrials(:,d);
             ExpDetails(d) = Exp;
             Data(d) = D;
@@ -425,20 +425,9 @@ for s = 1 : nSubj
     
 end % end of loop over subjects
 
-% save copy of Matlab code used to process data
-fileDate = datestr(now,'yyyymmmmdd');
-filePath = mfilename('fullpath');
-[fList,~] = matlab.codetools.requiredFilesAndProducts([filePath '.m']);
-fList = [[filePath '.m'] fList];
-fList = fList(cellfun(@isempty,strfind(fList,'ExpAlgemeen')));
-for f = 1 : length(fList)
-    mfilePath = fList{f};
-    iSlash = strfind(mfilePath,'/');
-    mfileName = mfilePath(iSlash(end)+1:end);
-    mfileCopyName = sprintf('%s_copy_%s',mfileName,fileDate);
-    copyfile(mfilePath,[saveToPath mfileCopyName]);
-end
+%% Save copy of code used to process data
 
-fprintf('\n'); disp('Done. Press continue to end.')
-keyboard
+mFilePath = mfilename('fullpath');
+saveCopyOfCode(mFilePath,saveToPath)
+
 close all
