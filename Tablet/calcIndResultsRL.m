@@ -70,20 +70,23 @@ for s = 1 : nSubj
         
         % get relevant variables
         score = D.score;
+        pathChange = D.pathChange;
         RT = D.iTargetGoLeaveCompleteEnd(:,3)-D.iTargetGoLeaveCompleteEnd(:,2);
         MT = D.iTargetGoLeaveCompleteEnd(:,4)-D.iTargetGoLeaveCompleteEnd(:,3);
         
         % preallocate
         allScores = NaN(nBlocks,max(nTrials_block));
+        allPathChanges = NaN(nBlocks,max(nTrials_block));
         allRT = NaN(nBlocks,max(nTrials_block));
         allMT = NaN(nBlocks,max(nTrials_block));
         
-        %% Loop over blocks to get scores, RT and MT
+        %% Loop over blocks to get scores, path changes, RT and MT
         
         % create matrix with scores per block
         for b = 1 : nBlocks
             currBlock = blockOrder(b)==blockNo;
             allScores(b,1:sum(currBlock)) = score(currBlock);
+            allPathChanges(b,1:sum(currBlock)) = pathChange(currBlock);
             allRT(b,1:sum(currBlock)) = RT(currBlock);
             allMT(b,1:sum(currBlock)) = MT(currBlock);
         end
@@ -101,6 +104,7 @@ for s = 1 : nSubj
         Results.targetPathNumberOfCurves = Exp.targetPathNumberOfCurves(blockOrder);
         Results.targetPathVisible = Exp.targetPathVisible(blockOrder);
         Results.score = allScores;
+        Results.pathChange = allPathChanges;
         Results.RT = allRT;
         Results.MT = allMT;
         
@@ -169,7 +173,7 @@ for s = 1 : nSubj
         suplabel(['Reinforcement learning raw scores - ' ExpDetails.subjFolder],'t'); % grand title
         
         if savePlots
-            saveFigAsPDF([saveFigsToPath 'RLscores_' ExpDetails.subjFolder],10)
+            saveFigAsPDF([saveFigsToPath 'RL_rawScores_' ExpDetails.subjFolder],10)
         end
         
         %% Plot cursor trajectories
@@ -239,7 +243,7 @@ for s = 1 : nSubj
         sup = suplabel(['Cursor trajectories - ' ExpDetails.subjFolder],'t'); % grand title
         
         if savePlots
-            saveFigAsPDF([saveFigsToPath 'RLtrajectories_' ExpDetails.subjFolder],10)
+            saveFigAsPDF([saveFigsToPath 'RL_trajectories_' ExpDetails.subjFolder],10)
         end
         
         %% End
