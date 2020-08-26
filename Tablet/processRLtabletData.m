@@ -547,12 +547,10 @@ for s = 1 : nSubj
     
 end % end of loop over subjects
 
-% save copy of Matlab code used to process data
-fileDate = datestr(now,'yyyymmmmdd');
-filePath = mfilename('fullpath');
-[fList,pList] = matlab.codetools.requiredFilesAndProducts([filePath '.m']);
-fileCopyName = sprintf('%s.m_copy_%s',mfilename,fileDate);
-copyfile([filePath '.m'],[saveToPath fileCopyName]);
+%% Save copy of code used to process data
+
+mFilePath = mfilename('fullpath');
+saveCopyOfCode(mFilePath,saveToPath)
 
 end
 
