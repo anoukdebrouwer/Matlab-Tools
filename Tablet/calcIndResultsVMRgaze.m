@@ -68,7 +68,9 @@ if processData
         maxMT = 0.4;
     end
     minMaxPercDistance = [75 125]; % gaze distance range for valid fixations
-    maxPercNoGaze = 50; % maximum % time with missing data per trial
+    maxPercNoGaze = 50; % maximum percentage time with missing data per trial
+    dPearlAngle  = abs(pearlAngle(2)-pearlAngle(1));
+    targetZone = [-1.5*dPearlAngle 1.5*dPearlAngle]; % target zone angles
     
     % length of intervals that data is resampled to in order to average
     % trial time courses across subjects
@@ -176,9 +178,13 @@ for s = 1 : nSubj
                 analyzedGazeData(1:n,d) = D_new.analyzedGazeData;
                 
                 % fixation angle closest to target and aimpoint
+                if visuomotorRotation>0
+                    aimZone = [-vmr*2 targetZone(1)];
+                elseif visuomotorRotation<0
+                    aimZone = [targetZone(2) -vmr*2];
+                end
                 iRows = (1:nTrials)';
                 for st = 1 : length(states)
-                    targetZone = fixAngles_temp.targetZone;
                     fixAngles_temp.(states{st}).closestT = NaN(nTrials,1);
                     fixAngles_temp.(states{st}).closestA = NaN(nTrials,1);
                     fixAngles_temp.(states{st}).closestOppA = NaN(nTrials,1);
@@ -200,7 +206,7 @@ for s = 1 : nSubj
                     iMin = sub2ind(size(a),iRows,iMin); % get linear index
                     aClosest = a(iMin);
                     iOnClosest = iOn(iMin);
-                    inAimZone = aClosest>-90 & aClosest<targetZone(1);
+                    inAimZone = aClosest>aimZone(1) & aClosest<aimZone(2);
                     fixAngles_temp.(states{st}).closestA(inAimZone) = aClosest(inAimZone);
                     fixAngles_temp.(states{st}).iOnset_closestA(inAimZone) = iOnClosest(inAimZone);
                     for b = 1 : max(Exp.blockNo)
@@ -213,7 +219,7 @@ for s = 1 : nSubj
                     [~,iMin] = nanmin(abs(a - vmr),[],2);
                     iMin = sub2ind(size(a),iRows,iMin); % get linear index
                     aClosest = a(iMin);
-                    inAimZone = aClosest>targetZone(2) & aClosest<90;
+                    inAimZone = aClosest>(-aimZone(2)) & aClosest<(-aimZone(1));
                     fixAngles_temp.(states{st}).closestOppA(inAimZone) = aClosest(inAimZone);
                 end
                 

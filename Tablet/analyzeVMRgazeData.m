@@ -53,11 +53,9 @@ if isfield(Exp,'pearlNumAngle') && all(~isnan(Exp.pearlNumAngle(:,2)))
     pearlAngle = [Exp.pearlNumAngle(:,2)-180; 180];
     dAngle  = pearlAngle(2)-pearlAngle(1);
     pearlBinAngles = [pearlAngle-0.5*dAngle pearlAngle+0.5*dAngle];
-    targetZone = [-1.5*dAngle 1.5*dAngle];
 else
     pearlAngle = NaN;
     pearlBinAngles = NaN;
-    targetZone = [-1.5*5.625 1.5*5.625];
     keyboard
 end
 
@@ -127,7 +125,6 @@ end
 fixAngle.anchor = NaN(nTrials,1); % does not work yet for 2 targets
 fixAngle.iAnchor_relReachOn = NaN(nTrials,1); % does not work yet for 2 targets
 fixAngle.iTarget_relReachOn = NaN(nTrials,1); % does not work yet for 2 targets
-fixAngle.targetZone = targetZone;
 percTimeFix.pearlBinAngles = pearlBinAngles';
 
 %% Loop over trials

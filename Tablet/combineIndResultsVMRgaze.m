@@ -3,8 +3,9 @@ function combineIndResultsVMRgaze(meanOrMedian,createPlots)
 % combine into a group data file.
 %
 % combineResultsVMRgaze loads the individual data files and creates and
-% saves matrices with the binned hand angle, reported aiming angle, aim
-% fixation angle, and implicit angle for all participants.
+% saves matrices with the mean (1; default) or median (2) binned hand angle,
+% reported aiming angle, aim fixation angle, and implicit angle for all
+% participants.
 %
 % For 2-day experiments, it is assumed that the experimental blocks on both
 % days are identical (although day 2 doesn't need to include all day-1 blocks).
@@ -41,6 +42,8 @@ detailsFile = dir([projectPath expFolder.name '/ExpDetails*.mat']);
 load([projectPath expFolder.name '/' detailsFile.name])
 nBins = nTrials/nTargets;
 vmr = visuomotorRotation;
+dPearlAngle = abs(pearlNumAngle(2,2)-pearlNumAngle(1,2));
+targetZone = [-1.5*dPearlAngle 1.5*dPearlAngle];
 
 % open figures
 fig1 = figure;
@@ -76,7 +79,6 @@ for s = 1 : nSubj
         rotBins = cursorRotation ~= 0;
         woBlock = find(ismember(lower(blockNames),'washout'));
         woBins = blockNo==woBlock;
-        targetZone = Results.fixAngles.day1.preview.targetZone;
     end
     
     %% Bin reaction time, cursor angle, hand angle, report angle, and fixation angle
@@ -203,7 +205,7 @@ for s = 1 : nSubj
     %% Plots
     
     if createPlots
-        %
+        % to do: move plots of binned angles from plotIndResultsVMRgaze here
     end
     
 end % end of loop over subjects
@@ -223,7 +225,7 @@ end
 % save file
 if overwrite == 1
     save([saveToPath fileName],'subj','blockNames','blockNo','iBin','nTrials',...
-        'cursorRotation','meanOrMedian','RT','handAngle','aimFixAngle','aimFixAngle_opp',...
+        'cursorRotation','meanOrMedian','RT','handAngle','aimFixAngle',...
         'reportAngle','implicitAngle','implicitAngle_fromFix','firstAimReportBin','firstAimFixBin');
     disp(['Saved ' saveToPath fileName])
     
@@ -234,7 +236,7 @@ else
     disp('Results not been saved')
 end
 
-%% Plot individual learning curves
+%% Plot all individual learning curves
 
 iMidBin = iBin+3;
 iRotationOnOff = find(diff(Results.cursorRotation(:,1))) + 0.5;
@@ -273,13 +275,14 @@ for i = 1 : 4
             plot(iMidBin,nanmean(reportAngle(:,:,d),2),'.-','color',colors(4,:),'linewidth',2);
             figTitle = 'Report angle';
         elseif i==3
-            plot(iMidBin,aimFixAngle(:,:,d),'.-','color',colors(7,:));
-            plot(iMidBin,aimFixAngle_opp(:,:,d),'.-','color',colors(7,:));
-            mAimFixAngle = nanmean([aimFixAngle(:,:,d) aimFixAngle_opp(:,:,d)],2);
-            plot(iMidBin,mAimFixAngle,'.-','color',colors(8,:),'linewidth',2);
-            nAimFixators = sum(~isnan(aimFixAngle(:,:,d)),2);
-            str = ['max n = ' num2str(max(nAimFixators))];
-            text(iMidBin(firstRotBin),0.5*vmr,str)
+            if any(aimFixAngle(:))
+                plot(iMidBin,aimFixAngle(:,:,d),'.-','color',colors(7,:));
+                mAimFixAngle = nanmean(aimFixAngle(:,:,d),2);
+                plot(iMidBin,mAimFixAngle,'.-','color',colors(8,:),'linewidth',2);
+                nAimFixators = sum(~isnan(aimFixAngle(:,:,d)),2);
+                str = ['max n = ' num2str(max(nAimFixators))];
+                text(iMidBin(firstRotBin),0.5*vmr,str)
+            end
             figTitle = 'Aimpoint fixation angle';
         elseif i==4
             % from report
