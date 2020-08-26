@@ -1,6 +1,13 @@
-function calcIndResultsRL(processData,createPlots,savePlots)
+function calcIndResultsRL(projectPath,processData,createPlots,savePlots)
 % calcIndResultsRL Calculate individual participant results in RL
 % experiments.
+%
+% calcIndResultsRL(projectPath,processData,createPlots,savePlots) 
+% loads the individual data in projectPath, and processes and saves the 
+% individual data when processData=TRUE. Individual results are plotted 
+% when createPlots=TRUE, and plots are saved when savePlots=TRUE. If the 
+% data has been processed before, plots can be created using the saved data
+% (processData=FALSE).
 
 % MIT License
 % Copyright (c) 2020 Anouk de Brouwer
@@ -9,20 +16,27 @@ close all
 
 % set defaults
 if nargin==0
+    projectPath = [];
     processData = true;
     createPlots = true;
     savePlots = false;
 end
 
-% select experiment data folder
-projectPath = '/Users/anouk/Documents/ExpsTablet/';
-expFolder = selectFiles([projectPath '*RL*'],'folders');
-while ~exist([projectPath expFolder.name '/1_RawData/'],'dir');
+% select project data path
+if isempty(projectPath)
+    projectPath = '/Users/anouk/Documents/ExpsTablet/';
+    expFolder = selectFiles([projectPath '*RL*'],'folders');
     projectPath = [projectPath expFolder.name '/'];
-    expFolder = selectFiles(projectPath,'folders'); % look in subfolders
 end
-dataPath = [projectPath expFolder.name '/2_ProcessedData/'];
-saveToPath = [projectPath expFolder.name '/3_Results/'];
+% check if we are at the right level
+while ~exist([projectPath '/1_RawData/'],'dir');
+    expFolder = selectFiles(projectPath,'folders');
+    projectPath = [projectPath expFolder.name '/'];
+end
+expName = getFolderName(projectPath); % experiment name
+% define path for input and output data
+dataPath = [projectPath '/2_ProcessedData/'];
+saveToPath = [projectPath '/3_Results/'];
 if ~exist(saveToPath,'dir')
     mkdir(saveToPath)
 end
@@ -60,6 +74,20 @@ for s = 1 : nSubj
             nTrials_block(b) = sum(currBlock);
         end
         
+        % get relevant variables
+        score = D.score;
+        pathChange = D.pathChange;
+        RT = D.iTargetGoLeaveCompleteEnd(:,3)-D.iTargetGoLeaveCompleteEnd(:,2);
+        MT = D.iTargetGoLeaveCompleteEnd(:,4)-D.iTargetGoLeaveCompleteEnd(:,3);
+        
+        % get relation between score on trial t and path change on trial t+1
+        score_ = score(blockNo>1); % remove practice block
+        pathChange_ = pathChange(blockNo>1);
+        score_pathChange = [score_(1:end-1) pathChange_(2:end)];
+        score_pathChange = score_pathChange(~isnan(score_pathChange(:,2)),:); % remove last/first trials of block
+        
+        %% Loop over blocks to get scores, path changes, RT and MT
+        
         % sort blocks based on number of curves and curvature
         pathDir = zeros(size(Exp.targetPathCurvature));
         pathDir(Exp.targetPathCurvature<0) = -1; % leftward curves
@@ -67,20 +95,13 @@ for s = 1 : nSubj
         expSpecs = [Exp.targetPathNumberOfCurves abs(Exp.targetPathCurvature) pathDir];
         [~,blockOrder] = sortrows(expSpecs(2:end,:));
         blockOrder = [1; blockOrder+1]; % start with baseline block
-        
-        % get relevant variables
-        score = D.score;
-        pathChange = D.pathChange;
-        RT = D.iTargetGoLeaveCompleteEnd(:,3)-D.iTargetGoLeaveCompleteEnd(:,2);
-        MT = D.iTargetGoLeaveCompleteEnd(:,4)-D.iTargetGoLeaveCompleteEnd(:,3);
+        % to do: save original block order to test for learning across blocks
         
         % preallocate
         allScores = NaN(nBlocks,max(nTrials_block));
         allPathChanges = NaN(nBlocks,max(nTrials_block));
         allRT = NaN(nBlocks,max(nTrials_block));
         allMT = NaN(nBlocks,max(nTrials_block));
-        
-        %% Loop over blocks to get scores, path changes, RT and MT
         
         % create matrix with scores per block
         for b = 1 : nBlocks
@@ -107,6 +128,7 @@ for s = 1 : nSubj
         Results.pathChange = allPathChanges;
         Results.RT = allRT;
         Results.MT = allMT;
+        Results.score_pathChange = score_pathChange;
         
         % check if file exists
         fileName = [Exp.subjFolder '.mat'];
@@ -212,6 +234,7 @@ for s = 1 : nSubj
                 ExpDetails.stim.targetWidthHeight]);
             
             % plot cursor trajectories
+            pc_d = [];
             for t = iUseTrials' % must be row vector to loop
                 xyCursor = Data.xyCursor{t};
                 int = Data.iTargetGoLeaveCompleteEnd(t,1):Data.iTargetGoLeaveCompleteEnd(t,4);
@@ -246,13 +269,29 @@ for s = 1 : nSubj
             saveFigAsPDF([saveFigsToPath 'RL_trajectories_' ExpDetails.subjFolder],10)
         end
         
+        %% Plot relation between score and path change on next trial
+        
+        fig3 = figure; movegui(fig3,'northeast');
+        scatterWithLinearFit(Results.score_pathChange(:,1),Results.score_pathChange(:,2),...
+            [0 100 0 max(pathChange)+5]);
+        set(gca,'xtick',0:20:100)
+        set(gca,'ytick',0:20:max(pathChange)+5)
+        xlabel('Score on trial t')
+        ylabel('Path change on trial t+1')
+        title(['Relation between score and path change - ' ExpDetails.subjFolder],...
+            'interpreter','none')
+        
+        if savePlots
+            saveFigAsPDF([saveFigsToPath 'RL_correlation_score_pathChange_' ExpDetails.subjFolder],12)
+        end
+        
         %% End
         
         disp('Press continue to go to next subject.')
         keyboard
         
         % close figures
-        close([fig1 fig2])
+        close([fig1 fig2 fig3])
         
     end % if createPlots
     

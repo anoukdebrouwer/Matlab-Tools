@@ -1,5 +1,5 @@
-function processVMRtabletData(plotTrials)
-% processVMRtabletData  Process raw data from VMR experiments on tablet setup
+function processVMRtabletData(projectPath,plotTrials)
+% processVMRtabletData  Process raw data from VMR experiments on tablet setup.
 %
 % processVMRtabletData loads, processes, and visualizes hand and eye
 % movement data collected in a visuomotor rotation (VMR) experiment on a
@@ -8,20 +8,21 @@ function processVMRtabletData(plotTrials)
 % - Wacom tablet in mock MRI scanner in Craine Building
 % - custom MRI-compatible tablet and Eyelink 1000 remote tracker in fMRI scanner
 %
-% processVMRtabletData asks the user to specify a project folder and select
-% one or multiple participants or sessions. The raw data should be stored
-% in a subfolder named '1_RawData', with a separate folder containing the
-% raw data (one file per trial) of each participant and session. The
-% function loads and cleans the data of each trial and saves a single
-% file per participant and session, containing a struct 'Exp' with
-% information about the experiment and trials, and a struct 'D' with data.
-% The processed data will be saved in a subfolder named '2_ProcessedData'.
+% processVMRtabletData(projectPath) asks the user to specify a project
+% folder (if undefined) and select one or multiple participants or sessions.
+% The raw data should be stored in a subfolder named '1_RawData', with a
+% separate folder containing the raw data (one file per trial) of each
+% participant and session. The function loads and cleans the data of each
+% trial and saves a single file per participant and session, containing a
+% struct 'Exp' with information about the experiment and trials, and a
+% struct 'D' with data. The processed data will be saved in a subfolder
+% named '2_ProcessedData'.
 %
-% processVMRtabletData(TRUE) plots each trial separately for visual inspection
-% during processing, and waits for the user to click a button to continue
-% to the next trial. The plot contains a subplot of the xy position of the
-% stimuli, hand and gaze, and a subplot of the hand and gaze position over
-% time.
+% processVMRtabletData(projectPath,TRUE) plots each trial separately for
+% visual inspection during processing, and waits for the user to click a
+% button to continue to the next trial. The plot contains a subplot of the
+% xy position of the stimuli, hand and gaze, and a subplot of the hand and
+% gaze position over time.
 
 % MIT License
 % Copyright (c) 2020 Anouk de Brouwer
@@ -29,18 +30,25 @@ function processVMRtabletData(plotTrials)
 close all;
 
 if nargin==0
+    projectPath = [];
     plotTrials = false;
 end
 
-% select experiment data folder
-projectPath = '/Users/anouk/Documents/ExpsTablet/';
-expFolder = selectFiles(projectPath,'folders');
-while ~exist([projectPath expFolder.name '/1_RawData/'],'dir');
+% select project data path
+if isempty(projectPath)
+    projectPath = '/Users/anouk/Documents/ExpsTablet/';
+    expFolder = selectFiles([projectPath '*VMR*'],'folders');
     projectPath = [projectPath expFolder.name '/'];
-    expFolder = selectFiles(projectPath,'folders'); % look in subfolders
 end
-dataPath = [projectPath expFolder.name '/1_RawData/'];
-saveToPath = [projectPath expFolder.name '/2_ProcessedData/'];
+% check if we are at the right level
+while ~exist([projectPath '/1_RawData/'],'dir');
+    expFolder = selectFiles(projectPath,'folders');
+    projectPath = [projectPath expFolder.name '/'];
+end
+expName = getFolderName(projectPath); % experiment name
+% define path for input and output data
+dataPath = [projectPath '/1_RawData/'];
+saveToPath = [projectPath '/2_ProcessedData/'];
 if ~exist(saveToPath,'dir')
     mkdir(saveToPath)
 end
@@ -203,7 +211,7 @@ for s = 1 : nSubj
         % get general info from datafile of first trial
         if t==1
             
-            Exp.expName = expFolder.name;
+            Exp.expName = expName;
             Exp = getTabletExpInfo(Exp,textdata);
             tabletCenterXY = Exp.setup.tabletCenterXY;
             Exp.subjFolder = subjFolders(s).name;
@@ -257,10 +265,10 @@ for s = 1 : nSubj
             strcmp(trialType{t},'ReachDM_K') | strcmp(trialType{t},'ReachDM_L');
         
         % make block numbers consistent across experiments
-        if strcmpi(expFolder.name,'VMRlearning_gaze/Exp3') && blockNo(t)>1
+        if strcmpi(expName,'Exp3') && blockNo(t)>1
             blockNo(t) = blockNo(t)+1;
         end
-        if strcmpi(expFolder.name,'VMRlearning_gaze_2018/Exp3_VMR45_WR') && blockNo(t)==6
+        if strcmpi(expName,'Exp3_VMR45_WR') && blockNo(t)==6
             blockNo(t) = 3;
         end
         
@@ -729,7 +737,7 @@ for s = 1 : nSubj
     initAngle_hand = initAngle_cursor - [cursorRotation cursorRotation];
     initAngle_hand(initAngle_hand<-180) = initAngle_hand(initAngle_hand<-180)+360;
     hitAngle_hand = hitAngle_cursor - [cursorRotation cursorRotation];
-    if str2double(expFolder.name(isstrprop(expFolder.name,'digit')))==4
+    if str2double(expName(isstrprop(expName,'digit')))==4
         hitAngle_hand = hitAngle_pen;
     end
     hitAngle_hand(hitAngle_hand<-180) = hitAngle_hand(hitAngle_hand<-180)+360;
@@ -850,10 +858,7 @@ for s = 1 : nSubj
 end % end of loop over subjects
 
 % save copy of Matlab code used to process data
-fileDate = datestr(now,'yyyymmmmdd');
-filePath = mfilename('fullpath');
-[fList,pList] = matlab.codetools.requiredFilesAndProducts([filePath '.m']);
-fileCopyName = sprintf('%s.m_copy_%s',mfilename,fileDate);
-copyfile([filePath '.m'],[saveToPath fileCopyName]);
+mFilePath = mfilename('fullpath');
+saveCopyOfCode(mFilePath,saveToPath)
 
 end

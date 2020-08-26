@@ -1,5 +1,5 @@
-function processRLtabletData(plotTrials)
-% processRLtabletData  Process raw data from RL experiments on tablet setup
+function processRLtabletData(projectPath,plotTrials)
+% processRLtabletData  Process raw data from RL experiments on tablet setup.
 %
 % processRLtabletData loads, processes, and visualizes hand movement data
 % collected in a reward-based motor learning (RL) experiment on a tablet
@@ -8,20 +8,21 @@ function processRLtabletData(plotTrials)
 % - Wacom tablet in mock MRI scanner in Craine Building
 % - custom MRI-compatible tablet in fMRI scanner
 %
-% processRLtabletData asks the user to specify a project folder and select
-% one or multiple participants or sessions. The raw data should be stored
-% in a subfolder named '1_RawData', with a separate folder containing the
-% raw data (one file per trial) of each participant and session. The
-% function loads and cleans the data of each trial and saves a single
-% file per participant and session, containing a struct 'Exp' with
-% information about the experiment and trials, and a struct 'D' with data.
-% The processed data will be saved in a subfolder named '2_ProcessedData'.
+% processRLtabletData(projectPath) asks the user to specify a project
+% folder (if unspecified) and select one or multiple participants or
+% sessions. The raw data should be stored in a subfolder named '1_RawData',
+% with a separate folder containing the raw data (one file per trial) of
+% each participant and session. The function loads and cleans the data of
+% each trial and saves a single file per participant and session,
+% containing a struct 'Exp' with information about the experiment and
+% trials, and a struct 'D' with data. The processed data will be saved in a
+% subfolder named '2_ProcessedData'.
 %
-% processRLTabletData(TRUE) plots each trial separately for visual inspection
-% during processing, and waits for the user to click a button to continue
-% to the next trial. The plot is an x y plot of the target path that the 
-% participant had to copy or find, the participant's cursor path, and the 
-% score shown to the participant.
+% processRLTabletData(projectPath,TRUE) plots each trial separately for
+% visual inspection during processing, and waits for the user to click a
+% button to continue to the next trial. The plot is an x y plot of the
+% target path that the participant had to copy or find, the participant's
+% cursor path, and the score shown to the participant.
 
 % MIT License
 % Copyright (c) 2020 Anouk de Brouwer
@@ -29,18 +30,25 @@ function processRLtabletData(plotTrials)
 close all;
 
 if nargin==0
+    projectPath = [];
     plotTrials = false;
 end
 
-% select experiment data folder
-projectPath = '/Users/anouk/Documents/ExpsTablet/';
-expFolder = selectFiles([projectPath '*RL*'],'folders');
-while ~exist([projectPath expFolder.name '/1_RawData/'],'dir');
+% set project data path
+if isempty(projectPath)
+    projectPath = '/Users/anouk/Documents/ExpsTablet/';
+    expFolder = selectFiles([projectPath '*RL*'],'folders');
     projectPath = [projectPath expFolder.name '/'];
-    expFolder = selectFiles(projectPath,'folders'); % look in subfolders
 end
-dataPath = [projectPath expFolder.name '/1_RawData/'];
-saveToPath = [projectPath expFolder.name '/2_ProcessedData/'];
+% check if we are at the right level
+while ~exist([projectPath '/1_RawData/'],'dir');
+    expFolder = selectFiles(projectPath,'folders');
+    projectPath = [projectPath expFolder.name '/'];
+end
+expName = getFolderName(projectPath); % experiment name
+% define path for input and output data
+dataPath = [projectPath '/1_RawData/'];
+saveToPath = [projectPath '/2_ProcessedData/'];
 if ~exist(saveToPath,'dir')
     mkdir(saveToPath)
 end
@@ -126,7 +134,7 @@ for s = 1 : nSubj
         % get general info from datafile of first trial
         if t==1
             
-            Exp.expName = expFolder.name;
+            Exp.expName = expName;
             Exp = getTabletExpInfo(Exp,textdata);
             Exp.subjFolder = subjFolders(s).name;
             Exp.rawdataFiles = rmfield(dataFiles,{'bytes','isdir','datenum'});

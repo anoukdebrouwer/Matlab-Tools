@@ -1,12 +1,13 @@
-function calcIndResultsVMRgaze(processData,createPlots,savePlots)
+function calcIndResultsVMRgaze(projectPath,processData,createPlots,savePlots)
 % calcIndResultsVMRgaze  Calculate individual participant results in VMR
 % experiments with gaze tracking.
 %
-% calcIndResultsVMRgaze(processData,createPlots,savePlots) loads, processes
-% and saves the individual data when processData=TRUE. Individual results
-% are plotted when createPlots=TRUE, and plots are saved when
-% savePlots=TRUE. If the data has been processed before, plots can be
-% created without first processing the data (processData=FALSE).
+% calcIndResultsVMRgaze(projectPath,processData,createPlots,savePlots)
+% loads the individual data in projectPath, and processes and saves the 
+% individual data when processData=TRUE. Individual results are plotted 
+% when createPlots=TRUE, and plots are saved when savePlots=TRUE. If the 
+% data has been processed before, plots can be created using the saved data
+% (processData=FALSE).
 
 % MIT License
 % Copyright (c) 2020 Anouk de Brouwer
@@ -15,20 +16,27 @@ close all
 
 % set defaults
 if nargin==0
+    projectPath = [];
     processData = true;
     createPlots = true;
     savePlots = false;
 end
 
-% select experiment data folder
-projectPath = '/Users/anouk/Documents/ExpsTablet/';
-expFolder = selectFiles(projectPath,'folders');
-while ~exist([projectPath expFolder.name '/1_RawData/'],'dir');
+% set project data path
+if isempty(projectPath)
+    projectPath = '/Users/anouk/Documents/ExpsTablet/';
+    expFolder = selectFiles([projectPath '*VMR*'],'folders');
     projectPath = [projectPath expFolder.name '/'];
-    expFolder = selectFiles(projectPath,'folders'); % look in subfolders
 end
-dataPath = [projectPath expFolder.name '/2_ProcessedData/'];
-saveToPath = [projectPath expFolder.name '/3_Results/'];
+% check if we are at the right level
+while ~exist([projectPath '/1_RawData/'],'dir');
+    expFolder = selectFiles(projectPath,'folders');
+    projectPath = [projectPath expFolder.name '/'];
+end
+expName = getFolderName(projectPath); % experiment name
+% define input and output data path
+dataPath = [projectPath '/2_ProcessedData/'];
+saveToPath = [projectPath '/3_Results/'];
 if ~exist(saveToPath,'dir')
     mkdir(saveToPath)
 end
@@ -51,8 +59,8 @@ end
 nSubj = length(subjFiles);
 
 % load experiment details
-detailsFile = dir([projectPath expFolder.name '/ExpDetails*.mat']);
-load([projectPath expFolder.name '/' detailsFile.name])
+detailsFile = dir([projectPath '/ExpDetails*.mat']);
+load([projectPath '/' detailsFile.name])
 nTrialBins = nTrials/nTargets;
 blocks = cellstr([repmat('block',nBlocks,1) num2str((1:nBlocks)')]);
 if exist('breakTrials','var')

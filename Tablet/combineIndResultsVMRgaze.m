@@ -1,14 +1,15 @@
-function combineIndResultsVMRgaze(meanOrMedian,createPlots)
+function combineIndResultsVMRgaze(projectPath,meanOrMedian,createPlots,savePlots)
 % combineIndResultsVMRgaze Bin individual data of VMR gaze experiments and
 % combine into a group data file.
 %
-% combineResultsVMRgaze(meanOrMedian) loads the individual data files,
-% calculates the mean (1; default) or median (2) binned hand angle,
-% reported aiming angle, aim fixation angle, and implicit angle for all
-% participants and saves a matrix for each of these variables.
+% combineResultsVMRgaze(projectPath,meanOrMedian) loads the individual data
+% files in projectPath, calculates the mean (1; default) or median (2)
+% hand angle, reported aiming angle, aim fixation angle, and implicit angle
+% per bin of trials for each participant. It then saves a matrix with the
+% for each of these variables with the values of all participants.
 %
-% combineResultsVMRgaze(meanOrMedian,createPlots) plots binned angles when
-% createPlots=TRUE.
+% combineResultsVMRgaze(projectPath,meanOrMedian,createPlots) plots binned
+% angles when createPlots=TRUE and saves these plots when savePlots=true;.
 %
 % For 2-day experiments, it is assumed that the experimental blocks on both
 % days are identical (although day 2 doesn't need to include all day-1 blocks).
@@ -17,19 +18,27 @@ function combineIndResultsVMRgaze(meanOrMedian,createPlots)
 % Copyright (c) 2020 Anouk de Brouwer
 
 if nargin==0
+    projectPath = [];
     meanOrMedian = 1;
-    createPlots = false;
+    createPlots = true;
+    savePlots = false;
 end
 
-% select experiment data folder
-projectPath = '/Users/anouk/Documents/ExpsTablet/';
-expFolder = selectFiles([projectPath '*VMR*'],'folders');
-while ~exist([projectPath expFolder.name '/1_RawData/'],'dir');
+% select project data path
+if isempty(projectPath)
+    projectPath = '/Users/anouk/Documents/ExpsTablet/';
+    expFolder = selectFiles([projectPath '*VMR*'],'folders');
     projectPath = [projectPath expFolder.name '/'];
-    expFolder = selectFiles(projectPath,'folders'); % look in subfolders
 end
-dataPath = [projectPath expFolder.name '/3_Results/'];
-saveToPath = [projectPath expFolder.name '/3_Results/'];
+% check if we are at the right level
+while ~exist([projectPath '/1_RawData/'],'dir');
+    expFolder = selectFiles(projectPath,'folders');
+    projectPath = [projectPath expFolder.name '/'];
+end
+expName = getFolderName(projectPath);
+% define input and output data path
+dataPath = [projectPath '/3_Results/'];
+saveToPath = [projectPath '/3_Results/'];
 cd(dataPath)
 
 % select subject data files
@@ -41,8 +50,8 @@ nSubj = length(subjFiles);
 subj = cell(1,nSubj);
 
 % load experiment details
-detailsFile = dir([projectPath expFolder.name '/ExpDetails*.mat']);
-load([projectPath expFolder.name '/' detailsFile.name])
+detailsFile = dir([projectPath '/ExpDetails*.mat']);
+load([projectPath '/' detailsFile.name])
 nBins = nTrials/nTargets;
 vmr = visuomotorRotation;
 dPearlAngle = abs(pearlNumAngle(2,2)-pearlNumAngle(1,2));
@@ -352,7 +361,7 @@ end % end of loop over subjects
 
 %% Save data file
 
-fileName = ['Results_binnedAngles_' expFolder.name '_' datestr(now,'yyyymmdd') '.mat'];
+fileName = ['Results_' expName '_' datestr(now,'yyyymmdd') '.mat'];
 
 % check if file does not exist yet
 if exist([saveToPath fileName],'file') == 2
@@ -458,11 +467,11 @@ for i = 1 : 4
         subplotNo = subplotNo+1;
     end
 end
-figTitle = [expFolder.name ' - group results (n=' num2str(nSubj) ')'];
+figTitle = [expName ' - group results (n=' num2str(nSubj) ')'];
 suplabel(figTitle,'t');
 
 % save figure
-figName = [expFolder.name '_binnedAngles'];
+figName = [expName '_binnedAngles'];
 if exist([saveToPath figName],'file') == 2 % check if file does not exist yet
     disp(['A figure named ' figName ' already exists.'])
     overwrite = input('Do you want to overwrite it? Yes(1) or no(0): ');
