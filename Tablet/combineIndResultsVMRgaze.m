@@ -2,10 +2,13 @@ function combineIndResultsVMRgaze(meanOrMedian,createPlots)
 % combineIndResultsVMRgaze Bin individual data of VMR gaze experiments and
 % combine into a group data file.
 %
-% combineResultsVMRgaze loads the individual data files and creates and
-% saves matrices with the mean (1; default) or median (2) binned hand angle,
+% combineResultsVMRgaze(meanOrMedian) loads the individual data files,
+% calculates the mean (1; default) or median (2) binned hand angle,
 % reported aiming angle, aim fixation angle, and implicit angle for all
-% participants.
+% participants and saves a matrix for each of these variables.
+%
+% combineResultsVMRgaze(meanOrMedian,createPlots) plots binned angles when
+% createPlots=TRUE.
 %
 % For 2-day experiments, it is assumed that the experimental blocks on both
 % days are identical (although day 2 doesn't need to include all day-1 blocks).
@@ -20,7 +23,7 @@ end
 
 % select experiment data folder
 projectPath = '/Users/anouk/Documents/ExpsTablet/';
-expFolder = selectFiles(projectPath,'folders');
+expFolder = selectFiles([projectPath '*VMR*'],'folders');
 while ~exist([projectPath expFolder.name '/1_RawData/'],'dir');
     projectPath = [projectPath expFolder.name '/'];
     expFolder = selectFiles(projectPath,'folders'); % look in subfolders
@@ -69,7 +72,7 @@ for s = 1 : nSubj
     
     load(subjFiles(s).name)
     disp(['Loaded ' subjFiles(s).name])
-    subj{s} = ExpDetails(1).subjName;
+    subj{s} = ExpDetails(1).subjFolder;
     
     % get general experiment information
     if s==1
@@ -205,14 +208,151 @@ for s = 1 : nSubj
     %% Plots
     
     if createPlots
-        % to do: move plots of binned angles from plotIndResultsVMRgaze here
+        % TO DO: create separate functions for each plot
+        
+        %% Plot binned angles - subplots
+        
+        % dataToPlot = {Results.mnBinnedHitAngle_hand};
+        % sdDataToPlot = {Results.sdBinnedHitAngle_hand};
+        % figTitles = {'Learning'};
+        % yLabels = {'Endpoint hand angle (deg)'};
+        % legends = {[]};
+        % if plotReport
+        %     if ~isfield(Results,'mnBinnedExplicitAngle_outliersRemoved')
+        %         Results.mnBinnedExplicitAngle_outliersRemoved = Results.binnedExplicitAngle;
+        %     end
+        %     Results.mnBinnedImplicitAngle_fix(~rotBins) = NaN;
+        %     dataToPlot = [dataToPlot {Results.mnBinnedExplicitAngle_outliersRemoved,...
+        %         cat(3,Results.mnBinnedImplicitAngle,Results.mnBinnedImplicitAngle_fix)}];
+        %     sdDataToPlot = [sdDataToPlot {[],cat(3,[],[])}];
+        %     figTitles = [figTitles {'Explicit learning','Implicit learning'}];
+        %     yLabels = [yLabels {'Reported aim angle (deg)','Hand minus reported aim angle (deg)'}];
+        %     legends = [legends {[],{'From report'}}];
+        %     %legends = [legends {[],{'From report','From fixation'}}];
+        % end
+        % if plotGaze
+        %     Results.mnBinnedFixAngle_closestA(~rotBins) = NaN;
+        %     dataToPlot = [dataToPlot {cat(3,Results.mnBinnedFixAngle_closestA,...
+        %         Results.mnBinnedFixAngle_closestOppA)}];
+        %     sdDataToPlot = [sdDataToPlot {cat(3,Results.sdBinnedFixAngle_closestA,...
+        %         Results.sdBinnedFixAngle_closestOppA)}];
+        %     figTitles = [figTitles {'Preview fixation closest to hand target'}];
+        %     yLabels = [yLabels {'Fixation angle (deg)'}];
+        %     legends{end} = {'From report','From fixation'};
+        %     legends = [legends {{['Closest to -' num2str(vmr)],['Closest to +' num2str(vmr)]}}];
+        % end
+        % if plotRT
+        %     dataToPlot = [dataToPlot {Results.mnBinnedRT*1000}]; % in ms
+        %     sdDataToPlot = [sdDataToPlot {Results.sdBinnedRT*1000}];
+        %     figTitles = [figTitles {'Reaction time'}];
+        %     yLabels = [yLabels {'Reaction time (ms)'}];
+        %     legends = [legends {[]}];
+        % end
+        % colors = cat(3,colors,fadedColors); % concatenate for looping
+        %
+        % figure(fig2); clf;
+        % nCol = length(dataToPlot);
+        % for d = 1 : nDays
+        %     for c = 1 : nCol
+        %         % create subplot with correct size
+        %         h(c) = subplot(nDays,nCol,d*nCol-nCol+c); hold on
+        %         pb = pbaspect; pbaspect([pb(1) 0.95*pb(2) pb(3)]);
+        %         h(c).Position(2) = h(c).Position(2)-0.025*pb(2);
+        %         % set axes
+        %         xlim([0 maxnTrials+1]); set(gca,'XTick',0:80:maxnTrials)
+        %         if ~isempty(strfind(yLabels{c},'deg'));
+        %             ylim([-95 50]); set(gca,'YTick',-90:45:45)
+        %         elseif ~isempty(strfind(yLabels{c},'ms'));
+        %             ylim([0 max(ExpDetails(1).timing.maxRT)*1000]);
+        %         end
+        %         yl = ylim;
+        %         % color background when rotation is on
+        %         for r = 1 : nRot
+        %             x = iRotationOnOff(r*2-1:r*2,d);
+        %             a = area([x; flipud(x)],[yl(1) yl(1) yl(2) yl(2)],'LineStyle','none');
+        %             a.FaceColor = [0.95 0.95 0.95];
+        %             plot(x,-[vmr vmr],'k') % draw line at hand target angle
+        %         end
+        %         plot([0 maxnTrials],[0 0],'k'); % draw line at 0
+        %         % plot data
+        %         for i = size(dataToPlot{c},3):-1:1
+        %             p(i) = plot(iBin,dataToPlot{c}(:,d,i),'o','color',colors(d,:,i));
+        %             if ~isempty(sdDataToPlot{c}(:,:,i))
+        %                 errorb(iBin,dataToPlot{c}(:,d,i),sdDataToPlot{c}(:,d,i),'barwidth',0,'color',colors(d,:,i))
+        %             end
+        %         end
+        %         hold off
+        %         % add labels, title, and legend
+        %         vertline(breakTrials(:,d),'g:')
+        %         vertline([iNewBlock(:,d)-0.5; nTrials(d)+0.5],'k:')
+        %         xlabel('Trial')
+        %         ylabel(yLabels{c})
+        %         if d==1
+        %             title(figTitles{c})
+        %             if ~isempty(legends{c})
+        %                 legend([p(1) p(2)],legends{c},'location','southwest'); legend('boxoff')
+        %             end
+        %         end
+        %     end
+        % end
+        % suplabel(['Binned angles - ' subjName],'t');
+        %
+        % % save
+        % if savePlots
+        %     saveFigAsPDF([saveToPath 'binnedAngles_' subjName],12)
+        % end
+        %
+        % colors = colors(:,:,1); % reset
+        %
+        % %% Plot binned angles - single plot overlayed
+        %
+        % figure(fig2b); clf
+        % for d = 1 : nDays
+        %     % create subplot with correct size
+        %     h(c) = subplot(nDays,1,d); hold on
+        %     pb = pbaspect; pbaspect([pb(1) 0.95*pb(2) pb(3)]);
+        %     h(c).Position(2) = h(c).Position(2)-0.025*pb(2);
+        %     % set axes
+        %     xlim([0 maxnTrials]); set(gca,'XTick',0:80:maxnTrials)
+        %     ylim([-60 20]); yl = ylim; set(gca,'Ytick',-60:15:45)
+        %     % color background when rotation is on
+        %     for r = 1 : nRot
+        %         x = iRotationOnOff(r*2-1:r*2,d);
+        %         a = area([x; flipud(x)],[yl(1) yl(1) yl(2) yl(2)],'LineStyle','none');
+        %         a.FaceColor = [0.95 0.95 0.95];
+        %         plot(x,-[vmr vmr],'k') % draw line at hand target angle
+        %     end
+        %     plot([0 maxnTrials],[0 0],'k'); % draw line at 0
+        %     % plot data
+        %     pi = plot(iBin,Results.mnBinnedImplicitAngle(:,d),'o-','color',colors(5,:));
+        %     ph = plot(iBin,Results.mnBinnedHitAngle_hand(:,d),'o-','color',colors(1,:));
+        %     pe = plot(iBin,Results.mnBinnedExplicitAngle_outliersRemoved(:,d),'o-','color',colors(2,:));
+        %     %pif = plot(iBin,Results.mnBinnedImplicitAngle_fix(:,d),'o-','color',fadedColors(5,:));
+        %     pf = plot(iBin,Results.mnBinnedFixAngle_closestA(:,d),'o-','color',colors(4,:));
+        %     hold off
+        %     % add lables and title
+        %     vertline(breakTrials(:,d),'g:')
+        %     vertline([iNewBlock(:,d)-0.5; nTrials(d)+0.5],'k:')
+        %     xlabel('Trial')
+        %     ylabel('Angle (deg)')
+        %     if d==1
+        %         title(['Binned angles - ' subjName],'interpreter','none')
+        %         legend([ph pe pi pf],{'Hand','Explicit','Implicit','Fixation'},'location','east');
+        %         legend('boxoff')
+        %     end
+        % end
+        %
+        % if savePlots
+        %     saveFigAsPDF([saveToPath 'binnedOverlayedAngles_' subjName],12)
+        % end
+        
     end
     
 end % end of loop over subjects
 
 %% Save data file
 
-fileName = ['Results_binnedAngles_' expFolder.name '.mat'];
+fileName = ['Results_binnedAngles_' expFolder.name '_' datestr(now,'yyyymmdd') '.mat'];
 
 % check if file does not exist yet
 if exist([saveToPath fileName],'file') == 2

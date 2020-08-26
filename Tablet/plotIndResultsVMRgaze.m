@@ -1,5 +1,16 @@
 function plotIndResultsVMRgaze(Results,ExpDetails,savePlots,saveToPath)
 % plotIndResultsVMRgaze  Plot individual participant results calculated in calcIndResultsVMRgaze.m
+%
+% Plots:
+% 1) Raw hand endpoint angles, reported aim angles and fixation angles
+% 2) Distributions of fixation angles per block
+% 3) Probability of fixation in start, target and aimpoint area per block
+% 4) Probability of fixation in start, target and aimpoint area - rotation
+%       block only
+% 5) Histogram of fixation angles, for each sequential fixation - rotation
+%       block only
+
+% TO DO: create separate functions for each plot
 
 % MIT License
 % Copyright (c) 2020 Anouk de Brouwer
@@ -82,8 +93,8 @@ end
 
 %close all
 fig1 = scaledFigure(0.5+1.0*plotGaze+0.5*plotReport+0.5*plotRT,0.8*nDays);  % raw angles [hand explicit fix-preview fix-reach]
-fig2 = scaledFigure(0.5+0.5*plotGaze+1*plotReport+0.5*plotRT,0.8*nDays);    % binned angles - subplots
-fig2b = scaledFigure(1,0.8*nDays);                                          % binned angles - overlayed
+%fig2 = scaledFigure(0.5+0.5*plotGaze+1*plotReport+0.5*plotRT,0.8*nDays);    % binned angles - subplots
+%fig2b = scaledFigure(1,0.8*nDays);                                          % binned angles - overlayed
 if plotGaze
     fig3 = scaledFigure(1,0.8*nDays);                                       % distribution of fixation angles per block
     if ~isempty(Results.probFix_blocks)
@@ -173,142 +184,6 @@ if savePlots
     saveFigAsPDF([saveToPath 'rawAngles_' subjName],12)
 end
 
-%% Plot binned angles - subplots
-
-dataToPlot = {Results.mnBinnedHitAngle_hand};
-sdDataToPlot = {Results.sdBinnedHitAngle_hand};
-figTitles = {'Learning'};
-yLabels = {'Endpoint hand angle (deg)'};
-legends = {[]};
-if plotReport
-    if ~isfield(Results,'mnBinnedExplicitAngle_outliersRemoved')
-        Results.mnBinnedExplicitAngle_outliersRemoved = Results.binnedExplicitAngle;
-    end
-    Results.mnBinnedImplicitAngle_fix(~rotBins) = NaN;
-    dataToPlot = [dataToPlot {Results.mnBinnedExplicitAngle_outliersRemoved,...
-        cat(3,Results.mnBinnedImplicitAngle,Results.mnBinnedImplicitAngle_fix)}];
-    sdDataToPlot = [sdDataToPlot {[],cat(3,[],[])}];
-    figTitles = [figTitles {'Explicit learning','Implicit learning'}];
-    yLabels = [yLabels {'Reported aim angle (deg)','Hand minus reported aim angle (deg)'}];
-    legends = [legends {[],{'From report'}}];
-    %legends = [legends {[],{'From report','From fixation'}}];
-end
-if plotGaze
-    Results.mnBinnedFixAngle_closestA(~rotBins) = NaN;
-    dataToPlot = [dataToPlot {cat(3,Results.mnBinnedFixAngle_closestA,...
-        Results.mnBinnedFixAngle_closestOppA)}];
-    sdDataToPlot = [sdDataToPlot {cat(3,Results.sdBinnedFixAngle_closestA,...
-        Results.sdBinnedFixAngle_closestOppA)}];
-    figTitles = [figTitles {'Preview fixation closest to hand target'}];
-    yLabels = [yLabels {'Fixation angle (deg)'}];
-    legends{end} = {'From report','From fixation'};
-    legends = [legends {{['Closest to -' num2str(vmr)],['Closest to +' num2str(vmr)]}}];
-end
-if plotRT
-    dataToPlot = [dataToPlot {Results.mnBinnedRT*1000}]; % in ms
-    sdDataToPlot = [sdDataToPlot {Results.sdBinnedRT*1000}];
-    figTitles = [figTitles {'Reaction time'}];
-    yLabels = [yLabels {'Reaction time (ms)'}];
-    legends = [legends {[]}];
-end
-colors = cat(3,colors,fadedColors); % concatenate for looping
-
-figure(fig2); clf;
-nCol = length(dataToPlot);
-for d = 1 : nDays
-    for c = 1 : nCol
-        % create subplot with correct size
-        h(c) = subplot(nDays,nCol,d*nCol-nCol+c); hold on
-        pb = pbaspect; pbaspect([pb(1) 0.95*pb(2) pb(3)]);
-        h(c).Position(2) = h(c).Position(2)-0.025*pb(2);
-        % set axes
-        xlim([0 maxnTrials+1]); set(gca,'XTick',0:80:maxnTrials)
-        if ~isempty(strfind(yLabels{c},'deg'));
-            ylim([-95 50]); set(gca,'YTick',-90:45:45)
-        elseif ~isempty(strfind(yLabels{c},'ms'));
-            ylim([0 max(ExpDetails(1).timing.maxRT)*1000]);
-        end
-        yl = ylim;
-        % color background when rotation is on
-        for r = 1 : nRot
-            x = iRotationOnOff(r*2-1:r*2,d);
-            a = area([x; flipud(x)],[yl(1) yl(1) yl(2) yl(2)],'LineStyle','none');
-            a.FaceColor = [0.95 0.95 0.95];
-            plot(x,-[vmr vmr],'k') % draw line at hand target angle
-        end
-        plot([0 maxnTrials],[0 0],'k'); % draw line at 0
-        % plot data
-        for i = size(dataToPlot{c},3):-1:1
-            p(i) = plot(iBin,dataToPlot{c}(:,d,i),'o','color',colors(d,:,i));
-            if ~isempty(sdDataToPlot{c}(:,:,i))
-                errorb(iBin,dataToPlot{c}(:,d,i),sdDataToPlot{c}(:,d,i),'barwidth',0,'color',colors(d,:,i))
-            end
-        end
-        hold off
-        % add labels, title, and legend
-        vertline(breakTrials(:,d),'g:')
-        vertline([iNewBlock(:,d)-0.5; nTrials(d)+0.5],'k:')
-        xlabel('Trial')
-        ylabel(yLabels{c})
-        if d==1
-            title(figTitles{c})
-            if ~isempty(legends{c})
-                legend([p(1) p(2)],legends{c},'location','southwest'); legend('boxoff')
-            end
-        end
-    end
-end
-suplabel(['Binned angles - ' subjName],'t');
-
-% save
-if savePlots
-    saveFigAsPDF([saveToPath 'binnedAngles_' subjName],12)
-end
-
-colors = colors(:,:,1); % reset
-
-%% Plot binned angles - single plot overlayed
-
-figure(fig2b); clf
-for d = 1 : nDays
-    % create subplot with correct size
-    h(c) = subplot(nDays,1,d); hold on
-    pb = pbaspect; pbaspect([pb(1) 0.95*pb(2) pb(3)]);
-    h(c).Position(2) = h(c).Position(2)-0.025*pb(2);
-    % set axes
-    xlim([0 maxnTrials]); set(gca,'XTick',0:80:maxnTrials)
-    ylim([-60 20]); yl = ylim; set(gca,'Ytick',-60:15:45)
-    % color background when rotation is on
-    for r = 1 : nRot
-        x = iRotationOnOff(r*2-1:r*2,d);
-        a = area([x; flipud(x)],[yl(1) yl(1) yl(2) yl(2)],'LineStyle','none');
-        a.FaceColor = [0.95 0.95 0.95];
-        plot(x,-[vmr vmr],'k') % draw line at hand target angle
-    end
-    plot([0 maxnTrials],[0 0],'k'); % draw line at 0
-    % plot data
-    pi = plot(iBin,Results.mnBinnedImplicitAngle(:,d),'o-','color',colors(5,:));
-    ph = plot(iBin,Results.mnBinnedHitAngle_hand(:,d),'o-','color',colors(1,:));
-    pe = plot(iBin,Results.mnBinnedExplicitAngle_outliersRemoved(:,d),'o-','color',colors(2,:));
-    %pif = plot(iBin,Results.mnBinnedImplicitAngle_fix(:,d),'o-','color',fadedColors(5,:));
-    pf = plot(iBin,Results.mnBinnedFixAngle_closestA(:,d),'o-','color',colors(4,:));
-    hold off
-    % add lables and title
-    vertline(breakTrials(:,d),'g:')
-    vertline([iNewBlock(:,d)-0.5; nTrials(d)+0.5],'k:')
-    xlabel('Trial')
-    ylabel('Angle (deg)')
-    if d==1
-        title(['Binned angles - ' subjName],'interpreter','none')
-        legend([ph pe pi pf],{'Hand','Explicit','Implicit','Fixation'},'location','east');
-        legend('boxoff')
-    end
-end
-
-if savePlots
-    saveFigAsPDF([saveToPath 'binnedOverlayedAngles_' subjName],12)
-end
-
 %% Plot distributions of fixation angles per block
 
 if any(Results.analyzedGazeData)
@@ -349,7 +224,7 @@ if any(Results.analyzedGazeData)
         saveFigAsPDF([saveToPath 'fixAngles_' subjName],12)
     end
     
-    %% Plot probability of fixation in start, target and aimpoint area - blocks
+    %% Plot probability of fixation in start, target and aimpoint area per block
     
     if ~isempty(Results.probFix_blocks)
         
@@ -463,7 +338,7 @@ if any(Results.analyzedGazeData)
         
     end
     
-    %% Histogram of fixation angles, for each sequential fixation
+    %% Histogram of fixation angles, for each sequential fixation - rotation block
     
     if length(pearlAngles)>1
         pa = pearlAngles(25:41);

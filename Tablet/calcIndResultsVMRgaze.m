@@ -1,6 +1,12 @@
 function calcIndResultsVMRgaze(processData,createPlots,savePlots)
 % calcIndResultsVMRgaze  Calculate individual participant results in VMR
 % experiments with gaze tracking.
+%
+% calcIndResultsVMRgaze(processData,createPlots,savePlots) loads, processes
+% and saves the individual data when processData=TRUE. Individual results
+% are plotted when createPlots=TRUE, and plots are saved when
+% savePlots=TRUE. If the data has been processed before, plots can be
+% created without first processing the data (processData=FALSE).
 
 % MIT License
 % Copyright (c) 2020 Anouk de Brouwer
@@ -341,7 +347,7 @@ for s = 1 : nSubj
             
             fprintf('\n')
         end % end of loop over days
-     
+        
         % remove report trials from RT and MT
         RT_all = RT;
         RT(~noReport) = NaN;
