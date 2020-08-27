@@ -217,9 +217,12 @@ for s = 1 : nSubj
     %% Plots
     
     if createPlots
-        % TO DO: create separate functions for each plot
+        % TO DO: update code
         
         %% Plot binned angles - subplots
+        
+        %fig2 = scaledFigure(0.5+0.5*plotGaze+1*plotReport+0.5*plotRT,0.8*nDays);    % binned angles - subplots
+        %fig2b = scaledFigure(1,0.8*nDays);                                          % binned angles - overlayed
         
         % dataToPlot = {Results.mnBinnedHitAngle_hand};
         % sdDataToPlot = {Results.sdBinnedHitAngle_hand};

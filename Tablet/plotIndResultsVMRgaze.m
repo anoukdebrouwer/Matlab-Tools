@@ -4,10 +4,10 @@ function plotIndResultsVMRgaze(Results,ExpDetails,savePlots,saveToPath)
 % Plots:
 % 1) Raw hand endpoint angles, reported aim angles and fixation angles
 % 2) Distributions of fixation angles per block
-% 3) Probability of fixation in start, target and aimpoint area per block
-% 4) Probability of fixation in start, target and aimpoint area - rotation
+% 3a) Probability of fixation in start, target and aimpoint area per block
+% 3b) Probability of fixation in start, target and aimpoint area - rotation
 %       block only
-% 5) Histogram of fixation angles, for each sequential fixation - rotation
+% 4) Histogram of fixation angles, for each sequential fixation - rotation
 %       block only
 
 % TO DO: create separate functions for each plot
@@ -93,18 +93,16 @@ end
 
 %close all
 fig1 = scaledFigure(0.5+1.0*plotGaze+0.5*plotReport+0.5*plotRT,0.8*nDays);  % raw angles [hand explicit fix-preview fix-reach]
-%fig2 = scaledFigure(0.5+0.5*plotGaze+1*plotReport+0.5*plotRT,0.8*nDays);    % binned angles - subplots
-%fig2b = scaledFigure(1,0.8*nDays);                                          % binned angles - overlayed
 if plotGaze
-    fig3 = scaledFigure(1,0.8*nDays);                                       % distribution of fixation angles per block
+    fig2 = scaledFigure(1,0.8*nDays);                                       % distribution of fixation angles per block
     if ~isempty(Results.probFix_blocks)
         nSubblocks = length(fieldnames(Results.probFix_subblocks.day1));
     else
         nSubblocks = 1;
     end
-    fig4 = scaledFigure(2,0.8*nDays);               % probability of fixation per block
-    fig4b = scaledFigure(2/3*nSubblocks,0.8*nDays); % probability of fixation per rotation subblock
-    fig5 = scaledFigure(1,0.8*nDays);               % histogram of fixation angles for sequential fixations
+    fig3a = scaledFigure(2,0.8*nDays);              % probability of fixation per block
+    fig3b = scaledFigure(2/3*nSubblocks,0.8*nDays); % probability of fixation per rotation subblock
+    fig3a = scaledFigure(1,0.8*nDays);              % histogram of fixation angles for sequential fixations
 end
 colors = get(gca,'colororder');
 fadedColors = colors+(1-colors)*0.6;
@@ -188,7 +186,7 @@ end
 
 if any(Results.analyzedGazeData)
     
-    figure(fig3); clf
+    figure(fig2); clf
     % plot gaze angle relative to target - target preview and reach
     for d = 1 : nDays
         b = 1 : size(Results.percTimeFix_blocks.(days{d}).preview.atPearl,1);
@@ -244,7 +242,7 @@ if any(Results.analyzedGazeData)
         nCol = length(b);
         
         % plot
-        figure(fig4); clf
+        figure(fig3a); clf
         for d = 1 : nDays
             for c = 1 : nCol
                 % compute
@@ -298,7 +296,7 @@ if any(Results.analyzedGazeData)
         nCol = length(b);
         
         % plot
-        figure(fig4b); clf
+        figure(fig3b); clf
         for d = 1 : nDays
             for c = 1 : nCol
                 % compute
@@ -343,7 +341,7 @@ if any(Results.analyzedGazeData)
     if length(pearlAngles)>1
         pa = pearlAngles(25:41);
         
-        figure(fig5); clf
+        figure(fig4); clf
         for d = 1 : nDays
             fixAngles_rot = Results.fixAngles.(days{d}).preview.all(rotationOn(:,d),:);
             fixAngles_rot = fixAngles_rot(~all(isnan(fixAngles_rot),2),:);
@@ -385,7 +383,7 @@ disp('Press continue to go to next subject.')
 keyboard
 
 % close figures
-close([fig1 fig2 fig2b])
+close(fig1)
 if plotGaze
-    close([fig3 fig4 fig4b fig5])
+    close([fig2 fig3a fig3b fig4])
 end
