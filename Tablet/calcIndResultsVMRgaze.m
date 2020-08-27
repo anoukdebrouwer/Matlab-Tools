@@ -3,9 +3,9 @@ function calcIndResultsVMRgaze(projectPath,processData,createPlots,savePlots)
 % experiments with gaze tracking.
 %
 % calcIndResultsVMRgaze(projectPath,processData,createPlots,savePlots)
-% loads the individual data in projectPath, and processes and saves the 
-% individual data when processData=TRUE. Individual results are plotted 
-% when createPlots=TRUE, and plots are saved when savePlots=TRUE. If the 
+% loads the individual data in projectPath, and processes and saves the
+% individual data when processData=TRUE. Individual results are plotted
+% when createPlots=TRUE, and plots are saved when savePlots=TRUE. If the
 % data has been processed before, plots can be created using the saved data
 % (processData=FALSE).
 
@@ -83,7 +83,7 @@ if processData
     end
     minMaxPercDistance = [75 125]; % gaze distance range for valid fixations
     maxPercNoGaze = 50; % maximum percentage time with missing data per trial
-    dPearlAngle  = abs(pearlAngle(2)-pearlAngle(1));
+    dPearlAngle  = abs(pearlNumAngle(2,2)-pearlNumAngle(1,2));
     targetZone = [-1.5*dPearlAngle 1.5*dPearlAngle]; % target zone angles
     
     % length of intervals that data is resampled to in order to average

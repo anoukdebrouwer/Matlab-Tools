@@ -168,7 +168,7 @@ for t = 1 : nTrials
         
         %% 2) Detect saccades and fixations
         
-        plotOnOff = true;
+        plotOnOff = false;
         % if gaze data is recorded during at least half of the relevant trial states
         if D.percNoGaze(t) < 50
             D.analyzedGazeData(t) = true;
