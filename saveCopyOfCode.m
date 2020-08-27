@@ -9,6 +9,7 @@ function saveCopyOfCode(mFilePath,saveToPath)
 fList = [[mFilePath '.m'] fList];
 fList = fList(cellfun(@isempty,strfind(fList,'saveCopyOfCode'))); % discard this function
 fList = fList(cellfun(@isempty,strfind(fList,'/Plotting-tools/'))); % discard plotting tools
+fList = fList(cellfun(@isempty,strfind(fList,'/Analysis-tools/'))); % discard analysis tools
 fList = unique(fList); % remove duplicates
 
 % loop over files and save a copy with the today's date in the name
