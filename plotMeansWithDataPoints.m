@@ -76,8 +76,10 @@ for i = 1 : nCol
     p(i) = plot(x(i,:),[mY(i) mY(i)],'color',color(i,:),'linewidth',2);
     
     % set x axis labels or legend
-    if i==nCol && ~isempty(labels)
+    if i==nCol
         set(gca,'XTick',1:nCol)
+    end
+    if ~isempty(labels)
         if length(labels)==nCol
             set(gca,'XTicklabels',labels)
         else
