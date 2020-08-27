@@ -15,4 +15,4 @@ end
 
 path_split = strsplit(path,filesep); % split path
 path_split = path_split(cellfun(@(x) ~isempty(x),path_split)); % remove empty strings
-folderName = path_split(end-level); % get folder name
+folderName = path_split{end-level}; % get folder name
