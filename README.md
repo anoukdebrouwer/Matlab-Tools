@@ -1,18 +1,18 @@
 # Plotting tools
 
-## createColorGradient.m
+**createColorGradient**<br>
 Create an RGB color gradient between two colors, with the start and end color and the number of colors in the gradient specified by the user.
 
-## errorb.m
+**errorb**<br>
 Draw error bars. By Jonathan C. Lansey, retrieved from [Matlab File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/27387-create-healthy-looking-error-bars).
 
-## getxPositionOfBars.m
+**getxPositionOfBars**<br>
 Get the x position of bars in a bar plot, e.g. for drawing error bars.
 
-## horline.m
+**horline**<br>
 Draw a horizontal line at a specified location in the current figure.
 
-## plotCorrelationMatrix.m
+**plotCorrelationMatrix**<br>
 Visualize the correlation between each two variables in the data as a colored cell in a correlation matrix, using a red-white-blue color gradient. Display the correlation coefficient in each cell with asterisks indicating the significance.
 
 Example:
@@ -26,7 +26,7 @@ plotCorrelationMatrix(X,labels);
 ```
 <img src="/Images/correlationMatrix_example.png" width="500">
 
-## plotMeansWithDataPoints.m
+**plotMeansWithDataPoints**<br>
 Create a boxplot-like plot displaying the mean or median value as a line, the variance as a shaded area, and individual values as points. By default, the mean and standard error of the mean are plotted, but alternative measures for central tendency and variance can be specified by the user. Colors can be specified to group variables. 
 
 Example:
@@ -46,16 +46,16 @@ set(gca,'XTickLabel',{'Length','Width'})
 ```
 <img src="/Images/meansWithDataPoints_example.png" width="500">
 
-## rgb.m
+**rgb**<br>
 Get the rgb value of a color by name. By Kristjan Jonasson, retrieved form [Matlab File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/24497-rgb-triple-of-color-name-version-2).
 
-## saveFigAsPDF.m
+**saveFigAsPDF**<br>
 Save the current figure as a pdf file. The file name, path, and font size are specified by the user. 
 
-## scaledFigure.m
+**scaledFigure**<br>
 Create a new figure window whose width and height are independently scaled by a factor relative to the default figure size.
 
-## scatterWithLinearFit.m
+**scatterWithLinearFit**<br>
 Create a scatter plot with a least-squares fitted line and a text box displaying the number of valid data points, correlation coefficient and corresponding p-value.
 
 Example:
@@ -67,8 +67,8 @@ ylabel('Acceleration')
 ```
 <img src="/Images/scatterWithLinearFit_example.png" width="500">
 
-## suplabel.m
+**suplabel**<br>
 Place a title, xlabel, or ylabel on a group of subplots. By Ben Barrowes, retrieved from [Matlab File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/7772-suplabel).
 
-## vertline.m
+**vertline**<br>
 Draw a vertical line at a specified location in the current figure.
