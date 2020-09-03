@@ -1,11 +1,10 @@
 function [b,r,p,n] = scatterWithLinearFit(x,y,xyLim,color,noPlot)
-% scatterWithLinearFit
-% Scatter plot with fitted line and correlation coefficient
+% scatterWithLinearFit Scatter plot with fitted line and correlation coefficient
 %
 % scatterWithLinearFit(x,y) creates a scatter plot with circles at the
 % locations specified by the vectors x and y, and a least-squares fitted 
-% line drawn in addition to the points. A box indicates the number of valid 
-% data points, removing NaNs, the correlation coefficient and the
+% line drawn in addition to the points. The title indicates the number of 
+% valid data points, removing NaNs, the correlation coefficient and the
 % corresponding p-value. 
 %
 % scatterWithLinearFit(x,y,xyLim) allows to set the x and y axis limits.
@@ -19,7 +18,8 @@ function [b,r,p,n] = scatterWithLinearFit(x,y,xyLim,color,noPlot)
 % and the number of valid data pairs (excluding NaNs). Set noPlot to TRUE 
 % to obtain the values without creating the plot.
 
-% Anouk de Brouwer
+% MIT License
+% Copyright (c) 2020 Anouk de Brouwer
 
 cla reset % clear and reset figure axes
 delete(findall(gca,'type','annotation')) % delete any previous annotations
@@ -66,12 +66,16 @@ if ~noPlot
     plot(xyLim(1)-100,xyLim(2)-100,'ko') % add point outside of plot for legend hack
     
     % add correlation values
-    str = {['n = ' num2str(n)],['r = ' num2str(r,'%1.2f')],['p = ' num2str(p,2)]};
-    l = legend(str,'Location','best');
-    a = annotation('textbox','String',str,'FitBoxToText','on');
-    a.Position = [l.Position(1:2) a.Position(3:4)];
-    delete(l);
-    a.BackgroundColor = 'w';
-    a.EdgeColor = color;
-    a.Color = color;
+    % as title
+    str = ['r=' num2str(r,'%1.2f') ', p=' num2str(p,2)];
+    title(str)
+    % as annotation box
+    %str = {['n = ' num2str(n)],['r = ' num2str(r,'%1.2f')],['p = ' num2str(p,2)]};
+    %l = legend(str,'Location','best');
+    %a = annotation('textbox','String',str,'FitBoxToText','on');
+    %a.Position = [l.Position(1:2) a.Position(3:4)];
+    %delete(l);
+    %a.BackgroundColor = 'w';
+    %a.EdgeColor = color;
+    %a.Color = color;
 end
