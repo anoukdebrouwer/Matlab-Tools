@@ -1,5 +1,3 @@
-# Matlab tools
-
 ## Analysis tools
 
 * **filterGazeData** - Remove blinks and filter raw gaze data from an Eyelink eye tracker.
