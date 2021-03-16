@@ -75,10 +75,10 @@ if resampleGaze
         y(xnan) = y(find(~xnan,1,'last'));
     end
     % for plot only
-    vxyGaze_raw(:,1) = gradient(xyGaze_raw(nw,1),1/fs);
-    vxyGaze_raw(:,2) = gradient(xyGaze_raw(nw,2),1/fs);
-    vx = interp1(tGaze(nw),vxyGaze_raw(:,1),t);
-    vy = interp1(tGaze(nw),vxyGaze_raw(:,2),t);
+    vx_raw = gradient(xyGaze_raw(nw,1),1/fs);
+    vy_raw = gradient(xyGaze_raw(nw,2),1/fs);
+    vx = interp1(tGaze(nw),vx_raw,t);
+    vy = interp1(tGaze(nw),vy_raw,t);
     vxyGaze_raw = [vx vy];
     % update
     xyGaze_raw = [x y];
