@@ -41,7 +41,7 @@ if ~isempty(Y) && (nargin<3 || isempty(varY))
 end
 
 % use grey if color is not provided
-if nargin<4
+if nargin<4 || isempty(color)
     color = [0.2 0.2 0.2];
 end
 color = repmat(color,size(mY,2)/size(color,1),1);
@@ -78,16 +78,17 @@ for i = 1 : nCol
     % set x axis labels or legend
     if i==nCol
         set(gca,'XTick',1:nCol)
-    end
-    if ~isempty(labels)
-        if length(labels)==nCol
-            set(gca,'XTicklabels',labels)
-        else
-            iLabels = [1; find(any(diff(color),2))+1]; % match labels to bars
-            iLabels = iLabels(1:length(labels));
-            legend(p(iLabels),labels,'location','best');
+        if ~isempty(labels)
+            if length(labels)==nCol
+                set(gca,'XTicklabels',labels,'XTickLabelRotation',90)
+            else
+                iLabels = [1; find(any(diff(color),2))+1]; % match labels to bars
+                iLabels = iLabels(1:length(labels));
+                legend(p(iLabels),labels,'location','best');
+            end
         end
     end
+    
 end
 xlim([1-barWidth nCol+barWidth])
 

@@ -1,10 +1,10 @@
 function selectedFiles = selectFiles(name,filesOrFolders)
 % selectFiles  Select files or folders from a list
-% 
-% selectedFiles = selectFiles('name') prints all files and folders that 
-% match the string names, waits for user input to select files, and returns 
-% a struct with file info of the selected files. name can be a file or 
-% folder in the current directory, or name can specify an absolute or 
+%
+% selectedFiles = selectFiles('name') prints all files and folders that
+% match the string names, waits for user input to select files, and returns
+% a struct with file info of the selected files. name can be a file or
+% folder in the current directory, or name can specify an absolute or
 % relative path. name can include wildcards (*), e.g., 's*' or '*.mat'.
 %
 % selectedFiles = selectFiles('name','kind') allows to specify to look for

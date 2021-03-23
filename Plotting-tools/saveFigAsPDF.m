@@ -1,17 +1,16 @@
 function saveFigAsPDF(figName,fontSize,overwrite)
-% saveFigAsPDF
-% Save figure as PDF file
+% saveFigAsPDF Save figure as PDF file
 %
 % saveFigAsPDF(figName) saves the current figure in the current directory
-% with the name figName, or in the path provided in figName. 
+% with the name figName, or in the path provided in figName.
 %
 % saveFigAsPDF(figName,fontSize) allows to set the font size (default is
-% 12). 
+% 12).
 %
 % saveFigAsPDF(figName,fontSize,overwrite) allows to automatically
-% overwrite a saved figure with the same name when overwrite is set to TRUE. 
-% By default, overwrite is set to FALSE, and the program will ask whether 
-% you want to overwrite a saved figure with the same name.  
+% overwrite a saved figure with the same name when overwrite is set to TRUE.
+% By default, overwrite is set to FALSE, and the program will ask whether
+% you want to overwrite a saved figure with the same name.
 
 % MIT License
 % Copyright (c) 2020 Anouk de Brouwer

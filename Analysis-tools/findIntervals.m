@@ -1,19 +1,19 @@
 function [i,iStartEnd] = findIntervals(X,n)
-% findIntervals  Find start and end indices of intervals during which one 
+% findIntervals  Find start and end indices of intervals during which one
 % or multiple conditions are nonzero
-% 
-% i = findIntervals(X,n) returns the first index of when all columns in X 
-% are nonzero for n or more rows. X should be a vector or a matrix with the 
+%
+% i = findIntervals(X,n) returns the first index of when all columns in X
+% are nonzero for n or more rows. X should be a vector or a matrix with the
 % conditions in columns.
 %
-% [i,iStartEnd] = findIntervals(X,n) returns a k-by-2 matrix with the start 
-% and end row indices of all k intervals in which all columns in X are 
+% [i,iStartEnd] = findIntervals(X,n) returns a k-by-2 matrix with the start
+% and end row indices of all k intervals in which all columns in X are
 % nonzero for n or more rows.
 %
 % If X contains no nonzero elements, findIntervals returns NaN.
 %
-% Example use case: find when both the x and y position of the hand are in 
-% a target area for at least 10 measurement samples. 
+% Example use case: find when both the x and y position of the hand are in
+% a target area for at least 10 measurement samples.
 
 % MIT License
 % Copyright (c) 2020 Anouk de Brouwer

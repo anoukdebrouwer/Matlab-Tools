@@ -2,30 +2,30 @@ function [xyGaze,vxyGaze,blink,notUpdated] = filterGazeData(xyGaze_raw,xyLimits,
 % filterGazeData  Remove blinks and filters raw gaze data from Eyelink eye tracker
 %
 % xyGaze = filterGazeData(xyGaze_raw,xyLimits,fs) filters the x and y gaze
-% positions in xyGaze_raw obtained from an Eyelink eye tracker at sampling 
-% frequency fs (typically 500 Hz) and returns them in output xyGaze. Blinks 
-% or intervals in which the pupil was lost (i.e., outside the area 
-% [xmin xmax ymin ymax] specified in xyLimits) for more than 20 samples are 
-% removed, shorter intervals are linearly interpolated. The x and y gaze 
-% positions are low-pass filtered with a 2nd order Butterworth filter with 
-% 30 Hz cutoff frequency. Arrays with NaNs are returned if the trial did 
+% positions in xyGaze_raw obtained from an Eyelink eye tracker at sampling
+% frequency fs (typically 500 Hz) and returns them in output xyGaze. Blinks
+% or intervals in which the pupil was lost (i.e., outside the area
+% [xmin xmax ymin ymax] specified in xyLimits) for more than 20 samples are
+% removed, shorter intervals are linearly interpolated. The x and y gaze
+% positions are low-pass filtered with a 2nd order Butterworth filter with
+% 30 Hz cutoff frequency. Arrays with NaNs are returned if the trial did
 % not contain valid gaze data.
 %
 % xyGaze = filterGazeData(xyGaze_raw,xyLimits,fs,nsMax) interpolates data
 % losses up to nsMax samples, and classifies intervals longer than nsMax
-% samples as blinks. 
+% samples as blinks.
 %
 % xyGaze = filterGazeData(xyGaze_raw,xyLimits,fs,nsMax,tGaze) resamples the
-% data to regular sampling if sampling is irregular, based on the time 
+% data to regular sampling if sampling is irregular, based on the time
 % stamps in tGaze.
 %
 % [xyGaze,vxyGaze] = filterGazeData(__) returns the x and y gaze velocity
 % in output vxyGaze corresponding to the positions in xyGaze.
 %
 % [xyGaze,vxyGaze,blink] = filterGazeData(__) additionally returns a
-% boolean variable in output blink that is true during blinks and false 
+% boolean variable in output blink that is true during blinks and false
 % otherwise.
-% 
+%
 % [xyGaze,vxyGaze,blink,notUpdated] = filterGazeData(__) additionally
 % returns a boolean variable in output notUpdated that indicates where
 % sampling problems occured (no new gaze position for at least 20 samples).

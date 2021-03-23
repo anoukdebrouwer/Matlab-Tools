@@ -1,8 +1,7 @@
 function h = scaledFigure(widthFactor,heightFactor)
-% scaledFigure
-% Create scaled figure window
+% scaledFigure Create scaled figure window
 %
-% scaledFigure(widthFactor,heightFactor) creates a new figure window and 
+% scaledFigure(widthFactor,heightFactor) creates a new figure window and
 % scales its width with widthFactor and its height with heighFactor.
 
 % MIT License
