@@ -8,7 +8,7 @@
 * **saccadeOnsetOffset2** - Find the onset and offset of saccades in eye movement data using a velocity threshold.
 * **saveCopyOfCode** - Save copy of code (e.g., with processed data) for future reference.
 * **selectFiles** - Manually select files or folders matching a name (can include wildcards). 
-* **xy2compassAngle** - Convert xy position to angle in degrees where 0 degrees is north and clockwise rotations are positive. 
+* **xy2compass** - Convert xy position to compass angle in degrees where 0 degrees is 'north' or up and clockwise rotations are positive.
 
 ## Plotting tools
 
